@@ -21,29 +21,19 @@ const TextInput = styled(RNTextInput);
 const ScrollView = styled(RNScrollView);
 const Pressable = styled(RNPressable);
 
-const jobOptions = [
-  "Retail", "Food Service", "Hospitality", "Construction", "Transportation", "Delivery",
-  "Warehouse", "Cleaning", "Security", "Call Center", "Customer Support", "Tech Support",
-  "Software Development", "Frontend Development", "Backend Development", "UI/UX Design",
-  "Graphic Design", "Content Writing", "Translation", "Education", "Tutoring", "Marketing",
-  "Sales", "Social Media", "Accounting", "Finance", "Real Estate", "Legal", "Medical Assistant",
-  "Nursing", "Caregiving", "Fitness Trainer", "Hairdresser", "Makeup Artist", "Event Planning",
-  "Photography", "Video Editing", "Project Management", "Operations", "Human Resources",
-  "Recruitment", "Data Entry", "Driving", "Motorbike Delivery", "Truck Driver", "Barista",
-  "Waiter", "Bartender", "Chef", "Kitchen Assistant", "Dishwasher", "Mover", "Installer",
-  "Electrician", "Plumber", "Mechanic", "Technician", "Fashion", "Modeling", "Telemarketing",
-  "Admin Assistant", "Reception", "Hosting", "Babysitting", "Pet Sitting", "Gardening",
-  "Painting", "Carpentry", "Cleaning Services", "Laundry", "Warehouse Operator", "Stocking",
-  "QA Tester", "Automation", "Data Analyst", "Product Manager", "Scrum Master", "Jira Expert",
-  "Notion Specialist", "SEO Expert", "Google Ads", "Facebook Ads", "CRM", "SAP", "ERP",
-  "Copywriting", "Script Writing", "Voiceover", "Remote Work", "Freelance Gigs", "Part-Time",
-  "Full-Time", "Internship", "Volunteer Work", "Short-Term", "Startup", "Corporate", "Night Shifts",
-  "Day Shifts", "Flexible", "Work from Home", "Hybrid", "On-Site"
+const industries = [
+  "Retail", "Food Service", "Hospitality", "Construction", "Transportation",
+  "Delivery", "Warehouse", "Cleaning", "Security", "Customer Support",
+  "Software Development", "Frontend Development", "Backend Development",
+  "UI/UX Design", "Graphic Design", "Education", "Tutoring", "Marketing",
+  "Sales", "Accounting", "Finance", "Real Estate", "Legal", "Fitness", "Medical",
+  "Photography", "Barista", "Chef", "Waiter", "Event Planning", "Fashion",
+  "Hair & Beauty", "Freelance", "Remote Work", "Driving", "Startup", "Corporate"
 ];
 
-export default function JobPreferencesStep() {
+export default function IndustryPrefrencesStep() {
   const navigation = useNavigation<any>();
-  const [selectedPrefs, setSelectedPrefs] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -64,31 +54,32 @@ export default function JobPreferencesStep() {
     ]).start();
   }, []);
 
-  const togglePref = (pref: string) => {
-    setSelectedPrefs((prev) =>
-      prev.includes(pref) ? prev.filter((p) => p !== pref) : [...prev, pref]
+  const toggle = (industry: string) => {
+    setSelected((prev) =>
+      prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
     );
   };
 
   const handleSave = async () => {
     const uid = auth.currentUser?.uid;
-    if (!uid || selectedPrefs.length === 0) {
-      Alert.alert('Please select at least one job preference');
+    if (!uid || selected.length === 0) {
+      Alert.alert('Please choose at least one industry');
       return;
     }
 
     try {
       await updateDoc(doc(db, 'users', uid), {
-        preferences: selectedPrefs,
+        preferred_tags: selected,
       });
-      navigation.navigate('Location');
+
+      navigation.navigate('Experience'); // next step
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
   };
 
-  const filtered = jobOptions.filter((j) =>
-    j.toLowerCase().includes(search.toLowerCase())
+  const filtered = industries.filter((i) =>
+    i.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -102,33 +93,33 @@ export default function JobPreferencesStep() {
       }}
     >
       <Text className="text-2xl font-bold text-blue-700 mb-4 text-center">
-        Choose Job Preferences
+        Select Industries You’d Like to Work In
       </Text>
 
       <TextInput
-        placeholder="Search job types..."
+        placeholder="Search industries..."
         value={search}
         onChangeText={setSearch}
         className="bg-white p-3 rounded-xl border border-blue-200 mb-4"
       />
 
       <ScrollView className="flex-1 mb-4">
-        {filtered.map((pref) => (
+        {filtered.map((industry) => (
           <Pressable
-            key={pref}
-            onPress={() => togglePref(pref)}
+            key={industry}
+            onPress={() => toggle(industry)}
             className={`p-2 px-4 rounded-full my-1 mr-2 border ${
-              selectedPrefs.includes(pref)
+              selected.includes(industry)
                 ? 'bg-blue-500 border-blue-700'
                 : 'bg-white border-blue-300'
             }`}
           >
             <Text
               className={`text-sm ${
-                selectedPrefs.includes(pref) ? 'text-white' : 'text-blue-800'
+                selected.includes(industry) ? 'text-white' : 'text-blue-800'
               }`}
             >
-              {pref}
+              {industry}
             </Text>
           </Pressable>
         ))}
@@ -137,6 +128,7 @@ export default function JobPreferencesStep() {
       <AppButton
         title="Save & Continue"
         onPress={handleSave}
+        bg="bg-gradient-to-r from-indigo-500 to-indigo-700"
       />
     </Animated.View>
   );

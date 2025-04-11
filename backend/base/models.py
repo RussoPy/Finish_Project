@@ -4,7 +4,7 @@ from django.db import models
 class Worker(models.Model):
     id = models.CharField(primary_key=True, max_length=100)
     name = models.CharField(max_length=100)
-    age = models.IntegerField()
+    birth_date = models.DateField(null=True, blank=True)
     location_lat = models.FloatField()
     location_lng = models.FloatField()
     preferred_tags = models.JSONField()
