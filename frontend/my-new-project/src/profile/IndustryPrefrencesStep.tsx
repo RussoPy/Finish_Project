@@ -14,6 +14,7 @@ import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -92,6 +93,7 @@ export default function IndustryPrefrencesStep() {
         padding: 20,
       }}
     >
+      <ProfileNavHeader onSkip={() => navigation.navigate('Experience')} />
       <Text className="text-2xl font-bold text-blue-700 mb-4 text-center">
         Select Industries You’d Like to Work In
       </Text>
@@ -128,7 +130,6 @@ export default function IndustryPrefrencesStep() {
       <AppButton
         title="Save & Continue"
         onPress={handleSave}
-        bg="bg-gradient-to-r from-indigo-500 to-indigo-700"
       />
     </Animated.View>
   );

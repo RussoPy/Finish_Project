@@ -14,6 +14,7 @@ import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -106,6 +107,7 @@ export default function SkillSelectionStep() {
         padding: 20,
       }}
     >
+      <ProfileNavHeader onSkip={() => navigation.navigate('TagPreferences')} />
       <Text className="text-2xl font-bold text-blue-700 mb-4 text-center">
         Choose Your Skills
       </Text>

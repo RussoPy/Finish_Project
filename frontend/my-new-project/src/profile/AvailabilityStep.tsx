@@ -12,6 +12,7 @@ import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -76,6 +77,7 @@ export default function AvailabilityStep() {
         justifyContent: 'center',
       }}
     >
+      <ProfileNavHeader onSkip={() => navigation.navigate('Availablity')} showSkip={false} />
       <Text className="text-2xl font-bold text-blue-700 mb-6 text-center">
         Job Availability
       </Text>
@@ -101,9 +103,8 @@ export default function AvailabilityStep() {
       ))}
 
       <AppButton
-        title="Save & Continue"
+        title="Finish"
         onPress={handleSubmit}
-        bg="bg-gradient-to-r from-indigo-500 to-indigo-700"
       />
     </Animated.View>
   );

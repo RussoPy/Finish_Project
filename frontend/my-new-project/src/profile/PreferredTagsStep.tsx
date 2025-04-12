@@ -14,6 +14,7 @@ import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -73,7 +74,7 @@ export default function TagPrefrencesStep() {
   const handleSave = async () => {
     const uid = auth.currentUser?.uid;
     if (!uid || selectedPrefs.length === 0) {
-      Alert.alert('Please select at least one job preference');
+      Alert.alert('Please select at least one tag preference');
       return;
     }
 
@@ -101,12 +102,14 @@ export default function TagPrefrencesStep() {
         padding: 20,
       }}
     >
+
+<ProfileNavHeader onSkip={() => navigation.navigate('IndustryPrefrencesStep')} />
       <Text className="text-2xl font-bold text-blue-700 mb-4 text-center">
-        Choose Job Preferences
+        Choose tag Preferences
       </Text>
 
       <TextInput
-        placeholder="Search job types..."
+        placeholder="Search tag types..."
         value={search}
         onChangeText={setSearch}
         className="bg-white p-3 rounded-xl border border-blue-200 mb-4"

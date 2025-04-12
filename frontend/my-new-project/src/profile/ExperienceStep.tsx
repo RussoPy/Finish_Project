@@ -12,6 +12,7 @@ import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -70,6 +71,7 @@ export default function ExperienceStep() {
         justifyContent: 'center',
       }}
     >
+      <ProfileNavHeader onSkip={() => navigation.navigate('JobLocationStep')} />
       <Text className="text-2xl font-bold text-blue-700 mb-6 text-center">
         What's your experience level?
       </Text>
@@ -97,7 +99,6 @@ export default function ExperienceStep() {
       <AppButton
         title="Save & Continue"
         onPress={handleSubmit}
-        bg="bg-gradient-to-r from-indigo-500 to-indigo-700"
       />
     </Animated.View>
   );

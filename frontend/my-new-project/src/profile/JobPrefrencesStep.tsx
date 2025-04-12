@@ -21,7 +21,6 @@ export default function JobPreferences() {
       <AppButton
         title="Continue"
         onPress={() => navigation.navigate('IndustryPrefrencesStep')}
-        bg="bg-gradient-to-r from-indigo-500 to-indigo-700"
       />
     </View>
   );

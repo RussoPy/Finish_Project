@@ -14,6 +14,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../api/firebase';
 import { AppButton } from '../components/AppButton';
 import { useNavigation } from '@react-navigation/native';
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -63,6 +64,7 @@ export default function ProfilePictureStep() {
 
   return (
     <View className="flex-1 items-center justify-center bg-blue-50 px-6">
+      <ProfileNavHeader onSkip={() => navigation.navigate('SkillSelection')} />
       <Text className="text-3xl font-bold text-blue-600 mb-6 text-center">
         Add a Profile Photo
       </Text>
