@@ -1,24 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
 import {
-  View as RNView,
-  Text as RNText,
-  TextInput as RNTextInput,
+  View,
+  Text,
+  TextInput,
   Alert,
   Animated,
   Easing,
-  Pressable as RNPressable,
+  Pressable,
 } from 'react-native';
-import { styled } from 'nativewind';
 import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
-
-const View = styled(RNView);
-const Text = styled(RNText);
-const TextInput = styled(RNTextInput);
-const Pressable = styled(RNPressable);
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
+import { Button } from 'react-native-paper';
 
 export default function SalaryStep() {
   const navigation = useNavigation<any>();
@@ -50,7 +48,7 @@ export default function SalaryStep() {
     const parsedMin = parseInt(min);
     const parsedMax = parseInt(max);
 
-    if (!uid || isNaN(parsedMin) || parsedMin > parsedMax) {
+    if (!uid || isNaN(parsedMin) || (parsedMax && parsedMin > parsedMax)) {
       Alert.alert('Please enter a valid salary range');
       return;
     }
@@ -58,7 +56,7 @@ export default function SalaryStep() {
     try {
       await updateDoc(doc(db, 'users', uid), {
         salary_min: parsedMin,
-        salary_max: parsedMax,
+        salary_max: parsedMax || null,
         salary_unit: unit,
       });
 
@@ -68,68 +66,148 @@ export default function SalaryStep() {
     }
   };
 
+  const isValid = !isNaN(parseInt(min));
+
   return (
     <Animated.View
-      style={{
-        flex: 1,
-        backgroundColor: '#f0f9ff',
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        padding: 20,
-        justifyContent: 'center',
-      }}
+      style={[
+        globalStyles.container,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      <ProfileNavHeader onSkip={() => navigation.navigate('Availability')} />
-      <Text className="text-2xl font-bold text-blue-700 mb-6 text-center">
-        Expected Salary Range
+      {/* 🔙 Header */}
+      <ProfileNavHeader
+        stepText="7/10"
+        progress={0.7}
+        onSkip={() => navigation.navigate('Availability')}
+        showBack={true}
+        showSkip={true}
+      />
+
+      {/* 💸 Title */}
+      <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
+        Salary <Text style={{ color: colors.secondary }}>Expectations?</Text>
       </Text>
 
-      <Text className="text-blue-600 mb-1 font-semibold">Minimum Salary (₪)</Text>
+      {/* 💬 Subtitle */}
+      <Text
+        style={{
+          color: colors.info,
+          textAlign: 'center',
+          fontSize: 14,
+          marginBottom: spacing.l,
+          paddingHorizontal: spacing.l,
+        }}
+      >
+        What’s your expected salary range?
+      </Text>
+
+      {/* 🧾 Minimum Salary */}
+      <Text style={{ color: colors.primary, fontWeight: '600', marginBottom: 4 }}>
+        Minimum Salary (₪)
+      </Text>
       <TextInput
-        className="bg-white p-3 rounded-xl border border-blue-200 text-center mb-4"
         placeholder="e.g. 6000"
         value={min}
         onChangeText={setMin}
         keyboardType="numeric"
+        style={{
+          height: 48,
+          backgroundColor: '#fff',
+          borderRadius: 12,
+          paddingHorizontal: spacing.m,
+          borderColor: colors.muted,
+          borderWidth: 1,
+          textAlign: 'center',
+          marginBottom: spacing.m,
+        }}
       />
 
-      <Text className="text-blue-600 mb-1 font-semibold">Maximum Salary (₪)</Text>
+      {/* 🧾 Maximum Salary */}
+      <Text style={{ color: colors.primary, fontWeight: '600', marginBottom: 4 }}>
+        Maximum Salary (₪)
+      </Text>
       <TextInput
-        className="bg-white p-3 rounded-xl border border-blue-200 text-center mb-4"
         placeholder="Optional"
         value={max}
         onChangeText={setMax}
         keyboardType="numeric"
+        style={{
+          height: 48,
+          backgroundColor: '#fff',
+          borderRadius: 12,
+          paddingHorizontal: spacing.m,
+          borderColor: colors.muted,
+          borderWidth: 1,
+          textAlign: 'center',
+          marginBottom: spacing.m,
+        }}
       />
 
-      <Text className="text-blue-600 mb-2 font-semibold">Salary Unit</Text>
-      <View className="flex-row justify-center mb-6">
-        <Pressable
-          onPress={() => setUnit('hour')}
-          className={`px-4 py-2 rounded-l-xl border ${
-            unit === 'hour'
-              ? 'bg-blue-500 border-blue-700'
-              : 'bg-white border-blue-300'
-          }`}
-        >
-          <Text className={unit === 'hour' ? 'text-white' : 'text-blue-800'}>Per Hour</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setUnit('month')}
-          className={`px-4 py-2 rounded-r-xl border ${
-            unit === 'month'
-              ? 'bg-blue-500 border-blue-700'
-              : 'bg-white border-blue-300'
-          }`}
-        >
-          <Text className={unit === 'month' ? 'text-white' : 'text-blue-800'}>Per Month</Text>
-        </Pressable>
+      {/* ⏱ Salary Unit Toggle */}
+      <Text style={{ color: colors.primary, fontWeight: '600', marginBottom: spacing.s }}>
+        Salary Unit
+      </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          marginBottom: spacing.xl,
+        }}
+      >
+        {['hour', 'month'].map((u) => {
+          const isActive = unit === u;
+          return (
+            <Pressable
+              key={u}
+              onPress={() => setUnit(u as 'hour' | 'month')}
+              style={{
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                backgroundColor: isActive ? colors.primary : '#fff',
+                borderWidth: 1,
+                borderColor: isActive ? colors.primary : colors.muted,
+                borderTopLeftRadius: u === 'hour' ? 12 : 0,
+                borderBottomLeftRadius: u === 'hour' ? 12 : 0,
+                borderTopRightRadius: u === 'month' ? 12 : 0,
+                borderBottomRightRadius: u === 'month' ? 12 : 0,
+              }}
+            >
+              <Text
+                style={{
+                  color: isActive ? '#fff' : colors.primary,
+                  fontWeight: '600',
+                }}
+              >
+                Per {u.charAt(0).toUpperCase() + u.slice(1)}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
-      <AppButton
-        title="Save & Continue"
+      {/* ✅ Floating Next */}
+      <Button
+        mode="contained"
         onPress={handleSubmit}
-      />
+        disabled={!isValid}
+        style={[
+          globalStyles.button,
+          {
+            position: 'absolute',
+            bottom: 30,
+            alignSelf: 'center',
+            backgroundColor: isValid ? colors.primary : colors.muted,
+          },
+        ]}
+        contentStyle={globalStyles.buttonContent}
+        labelStyle={{ color: 'white', fontWeight: '600' }}
+      >
+        Next
+      </Button>
     </Animated.View>
   );
 }

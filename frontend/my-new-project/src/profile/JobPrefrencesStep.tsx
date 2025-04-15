@@ -1,27 +1,72 @@
-import { View as RNView, Text as RNText } from 'react-native';
-import { styled } from 'nativewind';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { AppButton } from '../components/AppButton';
-
-const View = styled(RNView);
-const Text = styled(RNText);
+import { ProfileNavHeader } from '../components/ProfileNavHeader';
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
+import { Button } from 'react-native-paper';
 
 export default function JobPreferences() {
   const navigation = useNavigation<any>();
 
   return (
-    <View className="flex-1 items-center justify-center bg-blue-50 px-6">
-      <Text className="text-3xl font-bold text-blue-600 mb-4 text-center">
-        Let’s find your dream job
-      </Text>
-      <Text className="text-base text-blue-700 text-center mb-8">
-        Just a few more questions to help us understand what you're looking for.
-      </Text>
-
-      <AppButton
-        title="Continue"
-        onPress={() => navigation.navigate('IndustryPrefrencesStep')}
+    <View style={[globalStyles.container]}>
+      {/* 🔙 Header */}
+      <ProfileNavHeader
+        stepText="5/10"
+        progress={0.5}
+        showBack={true}
+        showSkip={false}
+        onSkip={() => navigation.navigate('IndustryPrefrencesStep')}
       />
+
+      {/* 📦 Centered block */}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: spacing.l,
+        }}
+      >
+        {/* 🎯 Title */}
+        <Text style={[globalStyles.title, { textAlign: 'center' }]}>
+          Let’s find your <Text style={{ color: colors.secondary }}>Dream Job</Text>
+        </Text>
+
+        {/* 📝 Subtitle */}
+        <Text
+          style={{
+            color: colors.info,
+            textAlign: 'center',
+            fontSize: 14,
+            marginTop: spacing.s,
+            paddingHorizontal: spacing.m,
+          }}
+        >
+          Just a few more questions to help us understand what you're looking for.
+        </Text>
+      </View>
+
+      {/* ✅ Continue Button */}
+      <Button
+        mode="contained"
+        onPress={() => navigation.navigate('IndustryPrefrencesStep')}
+        style={[
+          globalStyles.button,
+          {
+            position: 'absolute',
+            bottom: 30,
+            alignSelf: 'center',
+            backgroundColor: colors.primary,
+          },
+        ]}
+        contentStyle={globalStyles.buttonContent}
+        labelStyle={{ color: 'white', fontWeight: '600' }}
+      >
+        Continue
+      </Button>
     </View>
   );
 }

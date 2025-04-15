@@ -66,7 +66,7 @@ export default function ProfilePictureStep() {
         stepText="3/10"
         progress={0.3}
         onSkip={() => navigation.navigate('SkillSelection')}
-        showSkip={false}
+        showSkip={true}
         showBack={true}
       />
 

@@ -113,8 +113,8 @@ export default function BirthDateStep() {
         stepText="1/10"
         progress={0.1}
         showBack={false}
-        showSkip={false}
-        onSkip={() => navigation.navigate('Location')}
+        showSkip={true}
+        onSkip={() => navigation.navigate('JobLocationStep')}
       />
 
       {/* Title */}

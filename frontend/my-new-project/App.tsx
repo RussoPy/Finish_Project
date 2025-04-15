@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import 'react-native-get-random-values';
 import { Provider as PaperProvider } from 'react-native-paper';
 import colors from './src/styles/colors';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const theme = {
   roundness: 12,
@@ -25,11 +26,13 @@ const theme = {
 export default function App() {
   return (
     <>
-     <PaperProvider theme={theme}>
-      <AppNavigator />
-      <Toast />
-      <StatusBar style="dark" />
-     </PaperProvider>
+     <GestureHandlerRootView style={{ flex: 1 }}>
+       <PaperProvider theme={theme}>
+         <AppNavigator />
+         <Toast />
+         <StatusBar style="dark" />
+       </PaperProvider>
+     </GestureHandlerRootView>
     </>
   );
 }

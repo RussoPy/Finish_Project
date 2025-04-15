@@ -1,31 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  View as RNView,
-  Text as RNText,
-  Pressable as RNPressable,
+  View,
+  Text,
   Animated,
   Easing,
   Alert,
 } from 'react-native';
-import { styled } from 'nativewind';
-import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
- 
-const View = styled(RNView);
-const Text = styled(RNText);
-const Pressable = styled(RNPressable);
-
-const options = [
-  { label: 'Close to where I live', radius: 15 },
-  { label: 'I’m flexible', radius: 50 },
-];
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
+import { Button } from 'react-native-paper';
+import Slider from '../components/Slider';
 
 export default function JobLocationStep() {
   const navigation = useNavigation<any>();
-  const [selected, setSelected] = useState<number | null>(null);
+  const [sliderValue, setSliderValue] = useState(10); // animating as you slide
+  const [committedValue, setCommittedValue] = useState(10); // final value on release
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -47,18 +42,18 @@ export default function JobLocationStep() {
 
   const handleSubmit = async () => {
     const uid = auth.currentUser?.uid;
-    if (!uid || selected === null) {
-      Alert.alert('Please select a job location preference');
+    if (!uid) {
+      Alert.alert('Please select your preferred distance');
       return;
     }
 
     try {
       await updateDoc(doc(db, 'users', uid), {
-        job_search_radius: selected,
+        job_search_radius: committedValue,
       });
 
       Alert.alert('🎉 Job preferences complete!');
-      navigation.replace('Home'); // or go to summary
+      navigation.replace('Home');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
@@ -66,44 +61,90 @@ export default function JobLocationStep() {
 
   return (
     <Animated.View
-      style={{
-        flex: 1,
-        backgroundColor: '#f0f9ff',
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        padding: 20,
-        justifyContent: 'center',
-      }}
+      style={[
+        globalStyles.container,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      <ProfileNavHeader onSkip={() => navigation.navigate('Salary')} />
-      <Text className="text-2xl font-bold text-blue-700 mb-6 text-center">
-        Job Location Preference
-      </Text>
-
-      {options.map((opt) => (
-        <Pressable
-          key={opt.label}
-          onPress={() => setSelected(opt.radius)}
-          className={`mb-3 rounded-xl p-4 border ${
-            selected === opt.radius
-              ? 'bg-blue-500 border-blue-700'
-              : 'bg-white border-blue-300'
-          }`}
-        >
-          <Text
-            className={`text-center text-lg font-semibold ${
-              selected === opt.radius ? 'text-white' : 'text-blue-800'
-            }`}
-          >
-            {opt.label}
-          </Text>
-        </Pressable>
-      ))}
-
-      <AppButton
-        title="Save & Continue"
-        onPress={handleSubmit}
+      {/* 🧭 Header */}
+      <ProfileNavHeader
+        stepText="9/10"
+        progress={0.9}
+        onSkip={() => navigation.replace('Home')}
+        showBack
+        showSkip={false}
       />
+
+      {/* 📦 Shifted Content Higher */}
+      <View style={{ flex: 1, justifyContent: 'flex-start', marginTop: 30 }}>
+        {/* 🎯 Title */}
+        <Text style={[globalStyles.title]}>
+          your <Text style={{ color: colors.secondary }}>distance</Text>?
+        </Text>
+
+        {/* 📄 Subtitle */}
+        <Text
+          style={{
+            color: colors.info,
+            textAlign: 'center',
+            fontSize: 14,
+            marginBottom: spacing.l,
+            paddingHorizontal: spacing.l,
+          }}
+        >
+          Use the slider to set the maximum distance you’d like potential jobs to be located.
+        </Text>
+
+        {/* 📏 Slider */}
+        <View style={{ paddingHorizontal: spacing.l }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text style={{ fontWeight: '600', color: colors.primary }}>Distance</Text>
+            <Text style={{ fontWeight: '600', color: colors.primary }}>{sliderValue} km</Text>
+          </View>
+
+          <Slider
+            initialValue={sliderValue}
+            onValueChange={(val) => {
+              setSliderValue(val);
+              setCommittedValue(val);
+            }}
+          />
+        </View>
+
+        {/* ℹ️ Info */}
+        <Text
+          style={{
+            color: colors.info,
+            fontSize: 12,
+            textAlign: 'center',
+            marginTop: spacing.m,
+          }}
+        >
+          You can change this preference later in settings.
+        </Text>
+      </View>
+
+      {/* ✅ Finish Button */}
+      <Button
+        mode="contained"
+        onPress={handleSubmit}
+        style={[
+          globalStyles.button,
+          {
+            position: 'absolute',
+            bottom: 30,
+            alignSelf: 'center',
+            backgroundColor: colors.primary,
+          },
+        ]}
+        contentStyle={globalStyles.buttonContent}
+        labelStyle={{ color: 'white', fontWeight: '600' }}
+      >
+        Finish
+      </Button>
     </Animated.View>
   );
 }

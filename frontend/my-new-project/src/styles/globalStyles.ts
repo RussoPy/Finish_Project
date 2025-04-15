@@ -60,6 +60,34 @@ const globalStyles = StyleSheet.create({
   buttonContent: {
     paddingVertical: 12,
   },
+  sliderWrapper: {
+    width: '100%',
+    alignSelf: 'center',
+  },
+  sliderTrack: {
+    width: '100%',
+    height: 6,
+    backgroundColor: colors.muted,
+    borderRadius: 3,
+    justifyContent: 'center',
+  },
+  sliderFill: {
+    height: 6,
+    backgroundColor: colors.primary,
+    borderRadius: 3,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+  },
+  sliderThumb: {
+    width: 18,
+    height: 18,
+    backgroundColor: colors.primary,
+    borderRadius: 30,
+    position: 'absolute',
+    top: -7,
+  },
+  
 });
 
 export default globalStyles;

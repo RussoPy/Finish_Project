@@ -1,22 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  View as RNView,
-  Text as RNText,
-  Pressable as RNPressable,
+  Pressable,
   Animated,
   Easing,
   Alert,
+  ScrollView,
 } from 'react-native';
-import { styled } from 'nativewind';
-import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
-
-const View = styled(RNView);
-const Text = styled(RNText);
-const Pressable = styled(RNPressable);
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
+import { Button, Text } from 'react-native-paper';
 
 const options = ['Unexperienced', 'Beginner', 'Intermediate', 'Expert'];
 
@@ -54,7 +51,7 @@ export default function ExperienceStep() {
         experience_level: selected,
       });
 
-      navigation.navigate('Salary'); // go to next screen
+      navigation.navigate('Salary');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
@@ -62,44 +59,97 @@ export default function ExperienceStep() {
 
   return (
     <Animated.View
-      style={{
-        flex: 1,
-        backgroundColor: '#f0f9ff',
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        padding: 20,
-        justifyContent: 'center',
-      }}
+      style={[
+        globalStyles.container,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      <ProfileNavHeader onSkip={() => navigation.navigate('JobLocationStep')} />
-      <Text className="text-2xl font-bold text-blue-700 mb-6 text-center">
-        What's your experience level?
+      {/* 🔙 Nav Header */}
+      <ProfileNavHeader
+        stepText="6/10"
+        progress={0.6}
+        onSkip={() => navigation.navigate('Salary')}
+        showBack={true}
+        showSkip={true}
+      />
+
+      {/* 🏷️ Title */}
+      <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
+        your <Text style={{ color: colors.secondary }}>experience?</Text>
       </Text>
 
-      {options.map((opt) => (
-        <Pressable
-          key={opt}
-          onPress={() => setSelected(opt)}
-          className={`mb-3 rounded-xl p-4 border ${
-            selected === opt
-              ? 'bg-blue-500 border-blue-700'
-              : 'bg-white border-blue-300'
-          }`}
-        >
-          <Text
-            className={`text-center text-lg font-semibold ${
-              selected === opt ? 'text-white' : 'text-blue-800'
-            }`}
-          >
-            {opt}
-          </Text>
-        </Pressable>
-      ))}
+      {/* 📄 Subtitle */}
+      <Text
+        style={{
+          color: colors.info,
+          textAlign: 'center',
+          fontSize: 14,
+          marginBottom: spacing.l,
+          paddingHorizontal: spacing.l,
+        }}
+      >
+        Let us know your experience level to help match you with jobs that fit.
+      </Text>
 
-      <AppButton
-        title="Save & Continue"
+      {/* 💡 Experience Options */}
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 120,
+        }}
+      >
+        {options.map((opt) => {
+          const isSelected = selected === opt;
+          return (
+            <Pressable
+              key={opt}
+              onPress={() => setSelected(opt)}
+              style={{
+                borderRadius: 16,
+                paddingVertical: 14,
+                paddingHorizontal: 24,
+                marginBottom: spacing.m,
+                backgroundColor: isSelected ? colors.primary : '#fff',
+                borderWidth: 1,
+                borderColor: isSelected ? colors.primary : colors.muted,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  color: isSelected ? '#fff' : colors.primary,
+                  fontWeight: '600',
+                  fontSize: 16,
+                }}
+              >
+                {opt}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      {/* ✅ Floating Next Button */}
+      <Button
+        mode="contained"
         onPress={handleSubmit}
-      />
+        disabled={!selected}
+        style={[
+          globalStyles.button,
+          {
+            position: 'absolute',
+            bottom: 30,
+            alignSelf: 'center',
+            backgroundColor: selected ? colors.primary : colors.muted,
+          },
+        ]}
+        contentStyle={globalStyles.buttonContent}
+        labelStyle={{ color: 'white', fontWeight: '600' }}
+      >
+        Next
+      </Button>
     </Animated.View>
   );
 }

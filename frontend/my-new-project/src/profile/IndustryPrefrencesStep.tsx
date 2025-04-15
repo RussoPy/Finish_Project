@@ -1,26 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  View as RNView,
-  Text as RNText,
-  TextInput as RNTextInput,
-  ScrollView as RNScrollView,
-  Pressable as RNPressable,
+  TextInput,
+  ScrollView,
+  Pressable,
   Animated,
   Easing,
   Alert,
 } from 'react-native';
-import { styled } from 'nativewind';
-import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
-
-const View = styled(RNView);
-const Text = styled(RNText);
-const TextInput = styled(RNTextInput);
-const ScrollView = styled(RNScrollView);
-const Pressable = styled(RNPressable);
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
+import { Button, Text } from 'react-native-paper';
 
 const industries = [
   "Retail", "Food Service", "Hospitality", "Construction", "Transportation",
@@ -32,7 +26,7 @@ const industries = [
   "Hair & Beauty", "Freelance", "Remote Work", "Driving", "Startup", "Corporate"
 ];
 
-export default function IndustryPrefrencesStep() {
+export default function IndustryPreferencesStep() {
   const navigation = useNavigation<any>();
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState('');
@@ -85,52 +79,114 @@ export default function IndustryPrefrencesStep() {
 
   return (
     <Animated.View
-      style={{
-        flex: 1,
-        backgroundColor: '#f0f9ff',
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        padding: 20,
-      }}
+      style={[
+        globalStyles.container,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      <ProfileNavHeader onSkip={() => navigation.navigate('Experience')} />
-      <Text className="text-2xl font-bold text-blue-700 mb-4 text-center">
-        Select Industries You’d Like to Work In
+      {/* 🧭 Top Navigation */}
+      <ProfileNavHeader
+        stepText="5/10"
+        progress={0.5}
+        onSkip={() => navigation.navigate('Experience')}
+        showBack
+        showSkip={false}
+      />
+
+      {/* 🏷️ Title */}
+      <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
+        your <Text style={{ color: colors.secondary }}>industry?</Text>
       </Text>
 
+      {/* 📄 Subtitle */}
+      <Text
+        style={{
+          color: colors.info,
+          textAlign: 'center',
+          fontSize: 14,
+          marginBottom: spacing.l,
+          paddingHorizontal: spacing.l,
+        }}
+      >
+        Select industries you’d like to work in. You can choose more than one.
+      </Text>
+
+      {/* 🔍 Search */}
       <TextInput
         placeholder="Search industries..."
         value={search}
         onChangeText={setSearch}
-        className="bg-white p-3 rounded-xl border border-blue-200 mb-4"
+        style={{
+          height: 44,
+          backgroundColor: '#fff',
+          borderRadius: 12,
+          paddingHorizontal: spacing.m,
+          borderColor: colors.muted,
+          borderWidth: 1,
+          marginBottom: spacing.m,
+        }}
       />
 
-      <ScrollView className="flex-1 mb-4">
-        {filtered.map((industry) => (
-          <Pressable
-            key={industry}
-            onPress={() => toggle(industry)}
-            className={`p-2 px-4 rounded-full my-1 mr-2 border ${
-              selected.includes(industry)
-                ? 'bg-blue-500 border-blue-700'
-                : 'bg-white border-blue-300'
-            }`}
-          >
-            <Text
-              className={`text-sm ${
-                selected.includes(industry) ? 'text-white' : 'text-blue-800'
-              }`}
+      {/* 🧠 Pill Grid */}
+      <ScrollView
+        contentContainerStyle={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: 8,
+          paddingBottom: 100,
+        }}
+      >
+        {filtered.map((industry) => {
+          const isSelected = selected.includes(industry);
+          return (
+            <Pressable
+              key={industry}
+              onPress={() => toggle(industry)}
+              style={{
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                borderRadius: 24,
+                backgroundColor: isSelected ? colors.primary : '#fff',
+                borderWidth: 1,
+                borderColor: isSelected ? colors.primary : colors.muted,
+              }}
             >
-              {industry}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                style={{
+                  color: isSelected ? '#fff' : colors.primary,
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
+              >
+                {industry}
+              </Text>
+            </Pressable>
+          );
+        })}
       </ScrollView>
 
-      <AppButton
-        title="Save & Continue"
+      {/* ✅ Continue */}
+      <Button
+        mode="contained"
         onPress={handleSave}
-      />
+        disabled={selected.length === 0}
+        style={[
+          globalStyles.button,
+          {
+            position: 'absolute',
+            bottom: 30,
+            alignSelf: 'center',
+            backgroundColor: selected.length === 0 ? colors.muted : colors.primary,
+          },
+        ]}
+        contentStyle={globalStyles.buttonContent}
+        labelStyle={{ color: 'white', fontWeight: '600' }}
+      >
+        Next
+      </Button>
     </Animated.View>
   );
 }
