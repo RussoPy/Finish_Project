@@ -7,6 +7,7 @@ import { auth, db } from '../api/firebase';
 import { doc, updateDoc, Timestamp } from 'firebase/firestore';
 import globalStyles from '../styles/globalStyles';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
+import colors from '../styles/colors';
 
 export default function BirthDateStep() {
   const navigation = useNavigation<any>();
@@ -111,14 +112,14 @@ export default function BirthDateStep() {
       <ProfileNavHeader
         stepText="1/10"
         progress={0.1}
-        showBack={true}
-        showSkip={true}
+        showBack={false}
+        showSkip={false}
         onSkip={() => navigation.navigate('Location')}
       />
 
       {/* Title */}
       <Text style={globalStyles.title}>
-        your <Text style={globalStyles.bdayText}>b-day?</Text>
+        your <Text style={globalStyles.highlightText}>b-day?</Text>
       </Text>
 
       {/* Input */}
@@ -168,7 +169,12 @@ export default function BirthDateStep() {
       <Button
         mode="contained"
         onPress={handleSubmit}
-        style={globalStyles.button}
+        disabled={!birthDate}
+        style={[
+          globalStyles.button,
+          { backgroundColor: birthDate ? colors.primary : colors.muted },
+        ]}
+        
         contentStyle={globalStyles.buttonContent}
         labelStyle={{ color: 'white', fontWeight: '600' }}
       >

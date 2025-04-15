@@ -1,24 +1,22 @@
 import { useState } from 'react';
 import {
-  View as RNView,
-  Text as RNText,
+  View,
   Image,
-  Pressable as RNPressable,
+  Pressable,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { styled } from 'nativewind';
+import { Text } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../api/firebase';
-import { AppButton } from '../components/AppButton';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
-
-const View = styled(RNView);
-const Text = styled(RNText);
-const Pressable = styled(RNPressable);
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
+import { Button } from 'react-native-paper';
 
 export default function ProfilePictureStep() {
   const navigation = useNavigation<any>();
@@ -29,8 +27,7 @@ export default function ProfilePictureStep() {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: 0.7,
-      mediaTypes: ['images']
-
+      mediaTypes: ['images'],
     });
 
     if (!result.canceled) {
@@ -63,32 +60,74 @@ export default function ProfilePictureStep() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center bg-blue-50 px-6">
-      <ProfileNavHeader onSkip={() => navigation.navigate('SkillSelection')} />
-      <Text className="text-3xl font-bold text-blue-600 mb-6 text-center">
-        Add a Profile Photo
+    <View style={[globalStyles.container, { justifyContent: 'flex-start' }]}>
+      {/* 🔙 Header with Progress */}
+      <ProfileNavHeader
+        stepText="3/10"
+        progress={0.3}
+        onSkip={() => navigation.navigate('SkillSelection')}
+        showSkip={false}
+        showBack={true}
+      />
+
+      {/* 🖼️ Title */}
+      <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
+        your <Text style={{ color: colors.secondary }}>profile photo?</Text>
       </Text>
 
-      <Pressable onPress={pickImage}>
+      {/* 📸 Image Picker */}
+      <Pressable onPress={pickImage} style={{ alignSelf: 'center' }}>
         {imageUri ? (
           <Image
             source={{ uri: imageUri }}
-            style={{ width: 140, height: 140, borderRadius: 70, marginBottom: 20 }}
+            style={{
+              width: 140,
+              height: 140,
+              borderRadius: 70,
+              marginBottom: spacing.l,
+            }}
           />
         ) : (
-          <View className="w-[140px] h-[140px] rounded-full bg-blue-200 justify-center items-center mb-6">
-            <Text className="text-blue-800 font-semibold">Choose Photo</Text>
+          <View
+            style={{
+              width: 140,
+              height: 140,
+              borderRadius: 70,
+              backgroundColor: colors.muted,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: spacing.l,
+            }}
+          >
+            <Text style={{ color: colors.primary, fontWeight: '500' }}>
+              Choose Photo
+            </Text>
           </View>
         )}
       </Pressable>
 
+      {/* ⏳ Loader or Button */}
       {uploading ? (
-        <ActivityIndicator size="large" color="#0ea5e9" />
+        <ActivityIndicator size="large" color={colors.secondary} />
       ) : (
-        <AppButton
-          title="Save & Continue"
+        <Button
+          mode="contained"
           onPress={handleUpload}
-        />
+          disabled={!imageUri}
+          style={[
+            globalStyles.button,
+            {
+              backgroundColor: imageUri ? colors.primary : colors.muted,
+              position: 'absolute',
+              bottom: 30,
+              alignSelf: 'center',
+            },
+          ]}
+          contentStyle={globalStyles.buttonContent}
+          labelStyle={{ color: 'white', fontWeight: '600' }}
+        >
+          Next
+        </Button>
       )}
     </View>
   );

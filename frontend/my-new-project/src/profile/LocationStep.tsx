@@ -1,24 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import { GOOGLE_MAPS_API_KEY } from '@env'; // ✅ use @env, not process.env
 import {
-  Text,
   Alert,
   Animated,
   Easing,
   View,
 } from 'react-native';
-
 import MapView, { Marker, MapPressEvent } from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { GOOGLE_MAPS_API_KEY } from '@env';
+import { Text } from 'react-native-paper';
 import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
+import globalStyles from '../styles/globalStyles';
+import colors from '../styles/colors';
+import spacing from '../styles/spacing';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { Button } from 'react-native-paper';
 
 export default function LocationStep() {
   const navigation = useNavigation<any>();
   const mapRef = useRef<MapView | null>(null);
+  const placesRef = useRef<any>(null);
 
   const [region, setRegion] = useState({
     latitude: 32.0853,
@@ -69,6 +73,7 @@ export default function LocationStep() {
       const data = await res.json();
       const label = data.results?.[0]?.formatted_address;
       if (label) setSelectedAddress(label);
+      placesRef.current?.setAddressText(label);
     } catch (err) {
       console.warn('Reverse geocode failed', err);
     }
@@ -76,8 +81,8 @@ export default function LocationStep() {
 
   const handleSave = async () => {
     const uid = auth.currentUser?.uid;
-    if (!uid) {
-      Alert.alert('Please select a location');
+    if (!uid || !selectedAddress) {
+      Alert.alert('Please select your location before continuing.');
       return;
     }
 
@@ -95,96 +100,130 @@ export default function LocationStep() {
 
   return (
     <Animated.View
-    style={{
-      flex: 1,
-      backgroundColor: '#f0f9ff',
-      opacity: fadeAnim,
-      transform: [{ translateY: slideAnim }],
-    }}
-  >
-    <ProfileNavHeader
-      onSkip={() => navigation.navigate('ProfilePicture')}
-      showSkip={false}
-    />
-
-    <Text
-      style={{
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1d4ed8',
-        textAlign: 'center',
-        marginTop: 20,
-        marginBottom: 8,
-      }}
+      style={[
+        globalStyles.container,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      Find your exact address
-    </Text>
-
-    {/* 💡 Overlapping Autocomplete box */}
-    <View style={{ position: 'absolute', top: 90, left: 20, right: 20, zIndex: 999 }}>
-      <GooglePlacesAutocomplete
-        placeholder="Search address"
-        fetchDetails
-        onPress={(data, details = null) => {
-          const loc = details?.geometry?.location;
-          if (!loc) return;
-
-          animateToRegion(loc.lat, loc.lng);
-          setSelectedAddress(details?.formatted_address || '');
-        }}
-        query={{
-          key: GOOGLE_MAPS_API_KEY,
-          language: 'en',
-          components: 'country:il',
-        }}
-        styles={{
-          container: { flex: 0 },
-          textInput: {
-            height: 48,
-            borderRadius: 10,
-            borderColor: '#cbd5e1',
-            borderWidth: 1,
-            paddingHorizontal: 12,
-            backgroundColor: '#fff',
-            fontSize: 16,
-          },
-          listView: {
-            backgroundColor: '#fff',
-            borderRadius: 10,
-            marginTop: 4,
-            elevation: 3,
-            shadowColor: '#000',
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            shadowOffset: { width: 0, height: 2 },
-          },
-        }}
-        enablePoweredByContainer={false}
+      {/* ⬅️ Header with Progress */}
+      <ProfileNavHeader
+        stepText="2/10"
+        progress={0.2}
+        onSkip={() => navigation.navigate('ProfilePicture')}
+        showSkip={false}
+        showBack={true}
       />
-    </View>
 
-    {/* 🗺️ Map View */}
-    <View style={{ flex: 1, marginTop: 160, marginHorizontal: 20 }}>
-      <MapView
-        ref={mapRef}
-        style={{ flex: 1, borderRadius: 16 }}
-        region={region}
-        onPress={handleMapPress}
-      >
-        <Marker coordinate={region} />
-      </MapView>
-    </View>
-
-    {/* 🏷️ Selected Address */}
-    {selectedAddress ? (
-      <Text style={{ fontSize: 14, textAlign: 'center', color: '#64748b', marginVertical: 12 }}>
-        Selected: {selectedAddress}
+      <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
+        your <Text style={globalStyles.highlightText}>location?</Text>
       </Text>
-    ) : null}
 
-    <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
-      <AppButton title="Save & Continue" onPress={handleSave} />
-    </View>
-  </Animated.View>
+      {/* 🧾 Selected Address */}
+      {selectedAddress ? (
+        <Text
+          style={{
+            textAlign: 'center',
+            color: colors.info,
+            fontSize: 14,
+            marginTop: spacing.s,
+            marginBottom: spacing.m,
+            paddingHorizontal: spacing.l,
+          }}
+        >
+          {selectedAddress}
+        </Text>
+      ) : null}
+
+      {/* 📍 Google Search Input */}
+      <View
+        style={{
+          marginTop: spacing.s,
+          marginBottom: spacing.l,
+          marginHorizontal: spacing.l,
+          zIndex: 99,
+        }}
+      >
+        <GooglePlacesAutocomplete
+          ref={placesRef}
+          placeholder="Search your address"
+          fetchDetails
+          onPress={(data, details = null) => {
+            const loc = details?.geometry?.location;
+            if (!loc) return;
+
+            animateToRegion(loc.lat, loc.lng);
+            setSelectedAddress(details?.formatted_address || '');
+          }}
+          query={{
+            key: GOOGLE_MAPS_API_KEY,
+            language: 'en',
+            components: 'country:il',
+          }}
+          styles={{
+            container: { flex: 0 },
+            textInput: {
+              height: 48,
+              borderRadius: 12,
+              borderColor: colors.muted,
+              borderWidth: 1,
+              paddingHorizontal: spacing.m,
+              backgroundColor: '#fff',
+              fontSize: 16,
+            },
+            listView: {
+              backgroundColor: '#fff',
+              borderRadius: 10,
+              marginTop: 4,
+              elevation: 3,
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+            },
+          }}
+          enablePoweredByContainer={false}
+        />
+      </View>
+
+      {/* 🗺️ Map Display */}
+      <View
+        style={{
+          flex: 1,
+          marginTop: spacing.m,
+          marginHorizontal: spacing.l,
+          borderRadius: 16,
+          overflow: 'hidden',
+        }}
+      >
+        <MapView
+          ref={mapRef}
+          style={{ flex: 1 }}
+          region={region}
+          onPress={handleMapPress}
+        >
+          <Marker coordinate={region} />
+        </MapView>
+      </View>
+
+
+
+      {/* ✅ Continue Button */}
+      <Button
+        mode="contained"
+        onPress={handleSave}
+        disabled={!selectedAddress}
+        style={[
+          globalStyles.button,
+          { backgroundColor: selectedAddress ? colors.primary : colors.muted },
+        ]}
+        contentStyle={globalStyles.buttonContent}
+        labelStyle={{ color: 'white', fontWeight: '600' }}
+      >
+        Next
+      </Button>
+    </Animated.View>
   );
 }

@@ -43,7 +43,7 @@ const globalStyles = StyleSheet.create({
     marginBottom: spacing.l,
     color: colors.primary,
   },
-  bdayText: {
+  highlightText: {
     color: colors.secondary,
   },
   input: {
