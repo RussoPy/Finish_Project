@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   View,
-  Text,
   Animated,
   Easing,
   Alert,
 } from 'react-native';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
 import globalStyles from '../styles/globalStyles';
@@ -82,7 +82,7 @@ export default function JobLocationStep() {
       <View style={{ flex: 1, justifyContent: 'flex-start', marginTop: 30 }}>
         {/* 🎯 Title */}
         <Text style={[globalStyles.title]}>
-          your <Text style={{ color: colors.secondary }}>distance</Text>?
+          Job's <Text style={{ color: colors.secondary }}>distance</Text>?
         </Text>
 
         {/* 📄 Subtitle */}
