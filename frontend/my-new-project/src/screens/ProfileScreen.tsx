@@ -17,10 +17,8 @@ import colors from '../styles/colors';
 import spacing from '../styles/spacing';
 import AvailabilityEditor from './editors/AvailabilityEditor';
 import ExperienceEditor from './editors/ExperienceEditor';
-import IndustryEditor from './editors/IndustryEditor';
-import TagsEditor from './editors/TagsEditor';
-import SkillEditor from './editors/SkillEditor';
 import SalaryEditor from './editors/SalaryEditor';
+import { useNavigation } from '@react-navigation/native';
 import { GOOGLE_MAPS_API_KEY } from '@env';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -105,6 +103,8 @@ export default function ProfileScreen() {
     salary_unit: 'month',
   });
 
+  const navigation = useNavigation<any>();
+
   useEffect(() => {
     const fetchData = async () => {
       const uid = auth.currentUser?.uid;
@@ -125,7 +125,6 @@ export default function ProfileScreen() {
           salary_unit: userData.salary_unit || 'month',
         });
 
-        // Fetch readable address
         if (userData.location_lat && userData.location_lng) {
           const address = await getReadableAddress(userData.location_lat, userData.location_lng);
           setLocationText(address);
@@ -195,7 +194,7 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
-        {/* All Editable Sections */}
+        {/* Inline editable sections */}
         <Section title="Availability" expanded={expanded === 'availability'} onToggle={() => handleToggle('availability')}>
           <AvailabilityEditor
             value={form.availability}
@@ -210,41 +209,59 @@ export default function ProfileScreen() {
           />
         </Section>
 
-        <Section title="Industry" expanded={expanded === 'industry'} onToggle={() => handleToggle('industry')}>
-          <IndustryEditor
-            value={form.preferred_tags}
-            onChange={(val: string[]) => setForm((prev) => ({ ...prev, preferred_tags: val }))}
-          />
+        {/* Full-screen modal editors */}
+        <Section title="Industry" expanded={false} onToggle={() =>
+          navigation.navigate('EditIndustry', {
+            currentIndustries: form.preferred_tags,
+            onSave: (val: string[]) =>
+              setForm((prev) => ({ ...prev, preferred_tags: val })),
+          })
+        }>
+          <Text>{form.preferred_tags.length} selected</Text>
         </Section>
 
-        <Section title="Tags" expanded={expanded === 'tags'} onToggle={() => handleToggle('tags')}>
-          <TagsEditor
-            value={form.preferences}
-            onChange={(val: string[]) => setForm((prev) => ({ ...prev, preferences: val }))}
-          />
+        <Section title="Tags" expanded={false} onToggle={() =>
+          navigation.navigate('EditTags', {
+            currentTags: form.preferences,
+            onSave: (val: string[]) =>
+              setForm((prev) => ({ ...prev, preferences: val })),
+          })
+        }>
+          <Text>{form.preferences.length} selected</Text>
         </Section>
 
-        <Section title="Skills" expanded={expanded === 'skills'} onToggle={() => handleToggle('skills')}>
-          <SkillEditor
-            value={form.skills}
-            onChange={(val: string[]) => setForm((prev) => ({ ...prev, skills: val }))}
-          />
+        <Section title="Skills" expanded={false} onToggle={() =>
+          navigation.navigate('EditSkills', {
+            currentSkills: form.skills,
+            onSave: (val: string[]) =>
+              setForm((prev) => ({ ...prev, skills: val })),
+          })
+        }>
+          <Text>{form.skills.length} selected</Text>
         </Section>
 
         <Section title="Salary" expanded={expanded === 'salary'} onToggle={() => handleToggle('salary')}>
-          <SalaryEditor
-            min={form.salary_min}
-            max={form.salary_max}
-            unit={form.salary_unit}
-            onChange={({ min, max, unit }) =>
-              setForm((prev) => ({
-                ...prev,
-                salary_min: min,
-                salary_max: max,
-                salary_unit: unit,
-              }))
-            }
-          />
+        <SalaryEditor
+  min={form.salary_min}
+  max={form.salary_max}
+  unit={form.salary_unit}
+  onChange={({
+    min,
+    max,
+    unit,
+  }: {
+    min: string;
+    max: string;
+    unit: 'hour' | 'month';
+  }) =>
+    setForm((prev) => ({
+      ...prev,
+      salary_min: min,
+      salary_max: max,
+      salary_unit: unit,
+    }))
+  }
+/>
         </Section>
 
         <Button

@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileSetupNavigator from './ProfileSetupNavigator';
+import EditSkillsScreen from '../screens/editors/EditSkillsScreen';
+import EditTagsScreen from '../screens/editors/EditTagsScreen';
+import EditIndustryScreen from '../screens/editors/EditIndustryScreen';
 import { onSnapshot, doc } from 'firebase/firestore';
 import { auth, db } from '../api/firebase';
 import { ActivityIndicator, View as RNView } from 'react-native';
@@ -42,6 +45,9 @@ export default function AppStack() {
     <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="ProfileSetup" component={ProfileSetupNavigator} />
+      <Stack.Screen name="EditSkills" component={EditSkillsScreen} />
+      <Stack.Screen name="EditTags" component={EditTagsScreen} />
+      <Stack.Screen name="EditIndustry" component={EditIndustryScreen} />
     </Stack.Navigator>
   );
 }
