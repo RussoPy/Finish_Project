@@ -18,8 +18,8 @@ import Slider from '../components/Slider';
 
 export default function JobLocationStep() {
   const navigation = useNavigation<any>();
-  const [sliderValue, setSliderValue] = useState(10); // animating as you slide
-  const [committedValue, setCommittedValue] = useState(10); // final value on release
+  const [sliderValue, setSliderValue] = useState(5); // animating as you slide
+  const [committedValue, setCommittedValue] = useState(5); // final value on release
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -79,7 +79,7 @@ export default function JobLocationStep() {
       />
 
       {/* 📦 Shifted Content Higher */}
-      <View style={{ flex: 1, justifyContent: 'flex-start', marginTop: 30 }}>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
         {/* 🎯 Title */}
         <Text style={[globalStyles.title]}>
           Job's <Text style={{ color: colors.secondary }}>distance</Text>?

@@ -27,7 +27,7 @@ const HITBOX_SIZE = 23;
 
 export default function DistanceSlider({
   onValueChange,
-  min = 0,
+  min = 5,
   max = 100,
   step = 1,
   initialValue = 0,
@@ -52,7 +52,11 @@ export default function DistanceSlider({
 
   useEffect(() => {
     if (trackWidth > 0) {
-      offset.value = getOffsetFromValue(initialValue);
+      const offsetX = getOffsetFromValue(initialValue);
+      offset.value = offsetX;
+      const val = getValueFromOffset(offsetX);
+      setValue(val);
+      runOnJS(onValueChange)(val);
     }
   }, [trackWidth]);
 
@@ -86,7 +90,7 @@ export default function DistanceSlider({
   }));
 
   const fillStyle = useAnimatedStyle(() => ({
-    width: offset.value + THUMB_SIZE / 2,
+    width: offset.value,
   }));
 
   return (
@@ -105,6 +109,7 @@ export default function DistanceSlider({
         width: HITBOX_SIZE,
         height: HITBOX_SIZE,
         top: -(HITBOX_SIZE - THUMB_SIZE) / 2 - 2,
+        left: -(HITBOX_SIZE - THUMB_SIZE) / 2,
       },
       thumbStyle,
     ]}
