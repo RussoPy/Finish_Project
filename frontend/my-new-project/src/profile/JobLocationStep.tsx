@@ -50,6 +50,7 @@ export default function JobLocationStep() {
     try {
       await updateDoc(doc(db, 'users', uid), {
         job_search_radius: committedValue,
+        profileComplete: true,
       });
 
       Alert.alert('🎉 Job preferences complete!');
