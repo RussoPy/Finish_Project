@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   View,
-  Text,
   Animated,
   Easing,
   Alert,
 } from 'react-native';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
 import globalStyles from '../styles/globalStyles';
@@ -18,8 +18,8 @@ import Slider from '../components/Slider';
 
 export default function JobLocationStep() {
   const navigation = useNavigation<any>();
-  const [sliderValue, setSliderValue] = useState(10); // animating as you slide
-  const [committedValue, setCommittedValue] = useState(10); // final value on release
+  const [sliderValue, setSliderValue] = useState(5); // animating as you slide
+  const [committedValue, setCommittedValue] = useState(5); // final value on release
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -79,10 +79,10 @@ export default function JobLocationStep() {
       />
 
       {/* 📦 Shifted Content Higher */}
-      <View style={{ flex: 1, justifyContent: 'flex-start', marginTop: 30 }}>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
         {/* 🎯 Title */}
         <Text style={[globalStyles.title]}>
-          your <Text style={{ color: colors.secondary }}>distance</Text>?
+          Job's <Text style={{ color: colors.secondary }}>distance</Text>?
         </Text>
 
         {/* 📄 Subtitle */}

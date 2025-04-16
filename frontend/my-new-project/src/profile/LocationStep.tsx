@@ -9,7 +9,7 @@ import MapView, { Marker, MapPressEvent } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_API_KEY } from '@env';
-import { Text, Button } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { AppButton } from '../components/AppButton';
 import { auth, db } from '../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -17,6 +17,7 @@ import globalStyles from '../styles/globalStyles';
 import colors from '../styles/colors';
 import spacing from '../styles/spacing';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
+import { Button } from 'react-native-paper';
 
 export default function LocationStep() {
   const navigation = useNavigation<any>();
@@ -107,6 +108,7 @@ export default function LocationStep() {
         },
       ]}
     >
+      {/* ⬅️ Header with Progress */}
       <ProfileNavHeader
         stepText="2/10"
         progress={0.2}
@@ -119,6 +121,7 @@ export default function LocationStep() {
         your <Text style={globalStyles.highlightText}>location?</Text>
       </Text>
 
+      {/* 🧾 Selected Address */}
       {selectedAddress ? (
         <Text
           style={{
@@ -134,6 +137,7 @@ export default function LocationStep() {
         </Text>
       ) : null}
 
+      {/* 📍 Google Search Input */}
       <View
         style={{
           marginTop: spacing.s,
@@ -146,19 +150,12 @@ export default function LocationStep() {
           ref={placesRef}
           placeholder="Search your address"
           fetchDetails
-          debounce={400}
           onPress={(data, details = null) => {
-            if (!details || !details.geometry || !details.geometry.location) {
-              Alert.alert(
-                'Location Error',
-                "Couldn't fetch the selected location details. Please try a different place."
-              );
-              return;
-            }
+            const loc = details?.geometry?.location;
+            if (!loc) return;
 
-            const { lat, lng } = details.geometry.location;
-            animateToRegion(lat, lng);
-            setSelectedAddress(details.formatted_address || '');
+            animateToRegion(loc.lat, loc.lng);
+            setSelectedAddress(details?.formatted_address || '');
           }}
           query={{
             key: GOOGLE_MAPS_API_KEY,
@@ -191,6 +188,7 @@ export default function LocationStep() {
         />
       </View>
 
+      {/* 🗺️ Map Display */}
       <View
         style={{
           flex: 1,
@@ -210,6 +208,9 @@ export default function LocationStep() {
         </MapView>
       </View>
 
+
+
+      {/* ✅ Continue Button */}
       <Button
         mode="contained"
         onPress={handleSave}

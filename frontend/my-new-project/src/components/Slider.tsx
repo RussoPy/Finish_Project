@@ -3,105 +3,130 @@ import { View, LayoutChangeEvent } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withDecay,
-  withTiming,
+  withSpring,
   runOnJS,
 } from 'react-native-reanimated';
 import {
-  GestureDetector,
-  Gesture,
-  GestureUpdateEvent,
-  PanGestureHandlerEventPayload,
-  TapGestureHandler,
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
-import colors from '../styles/colors';
-import spacing from '../styles/spacing';
-import globalStyles from '../styles/globalStyles';
 
-// === Configurable Constants ===
-const THUMB_SIZE = 18; // visible size of thumb
-const DRAG_DECAY_MULTIPLIER = 0.5;
-const SLIDE_DURATION = 20;
-const TAP_ANIMATION_DURATION = 100;
-const FILL_ADJUST = THUMB_SIZE / 2;
+import colors from '../styles/colors';
+import globalStyles from '../styles/globalStyles';
 
 interface DistanceSliderProps {
   onValueChange: (val: number) => void;
-  initialValue?: number;
   min?: number;
   max?: number;
   step?: number;
+  initialValue?: number;
 }
+
+const THUMB_SIZE = 12;
+const HITBOX_SIZE = 23;
 
 export default function DistanceSlider({
   onValueChange,
-  initialValue = 10,
   min = 5,
-  max = 50,
+  max = 100,
   step = 1,
+  initialValue = 0,
 }: DistanceSliderProps) {
-  const [trackWidth, setTrackWidth] = useState(300);
-  const SLIDER_RANGE = trackWidth - THUMB_SIZE;
+  const [trackWidth, setTrackWidth] = useState(0);
+  const [value, setValue] = useState(initialValue);
 
-  const percentage = (initialValue - min) / (max - min);
-  const x = useSharedValue(percentage * SLIDER_RANGE);
+  const offset = useSharedValue(0);
+  const startX = useSharedValue(0);
+  const thumbScale = useSharedValue(1);
 
-  const gesture = Gesture.Pan()
-    .onUpdate((e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
-      x.value = Math.min(Math.max(0, x.value + e.translationX), SLIDER_RANGE);
-    })
-    .onEnd((e) => {
-      const velocity = e.velocityX * DRAG_DECAY_MULTIPLIER;
-      x.value = withDecay({ velocity, clamp: [0, SLIDER_RANGE] });
+  const getValueFromOffset = (x: number) => {
+    const pct = Math.min(Math.max(x / (trackWidth - THUMB_SIZE), 0), 1);
+    const stepped = Math.round((pct * (max - min)) / step) * step + min;
+    return stepped;
+  };
 
-      const raw = min + (x.value / SLIDER_RANGE) * (max - min);
-      const stepped = Math.round(raw / step) * step;
-      const clamped = Math.min(max, Math.max(min, stepped));
-      const newX = ((clamped - min) / (max - min)) * SLIDER_RANGE;
-      x.value = withTiming(newX, { duration: SLIDE_DURATION });
-      runOnJS(onValueChange)(clamped);
-    });
+  const getOffsetFromValue = (val: number) => {
+    const pct = (val - min) / (max - min);
+    return pct * (trackWidth - THUMB_SIZE);
+  };
 
-  const tapGesture = Gesture.Tap()
-    .onEnd((e) => {
-      const tapX = Math.min(Math.max(0, e.x - THUMB_SIZE / 2), SLIDER_RANGE);
-      x.value = withTiming(tapX, { duration: TAP_ANIMATION_DURATION });
+  useEffect(() => {
+    if (trackWidth > 0) {
+      const offsetX = getOffsetFromValue(initialValue);
+      offset.value = offsetX;
+      const val = getValueFromOffset(offsetX);
+      setValue(val);
+      runOnJS(onValueChange)(val);
+    }
+  }, [trackWidth]);
 
-      const raw = min + (tapX / SLIDER_RANGE) * (max - min);
-      const stepped = Math.round(raw / step) * step;
-      const clamped = Math.min(max, Math.max(min, stepped));
-      runOnJS(onValueChange)(clamped);
-    });
+  const handleGestureStart = () => {
+    startX.value = offset.value;
+    thumbScale.value = withSpring(1.2);
+  };
+
+  const handleGestureActive = (event: PanGestureHandlerGestureEvent) => {
+    const rawX = startX.value + event.nativeEvent.translationX;
+    const clampedX = Math.min(Math.max(rawX, 0), trackWidth - THUMB_SIZE);
+    offset.value = clampedX;
+    const val = getValueFromOffset(clampedX);
+    runOnJS(setValue)(val);
+    runOnJS(onValueChange)(val);
+  };
+
+  const handleGestureEnd = () => {
+    const snapped = getValueFromOffset(offset.value);
+    const newOffset = getOffsetFromValue(snapped);
+    offset.value = withSpring(newOffset);
+    thumbScale.value = withSpring(1);
+  };
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    setTrackWidth(event.nativeEvent.layout.width);
+  };
 
   const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: x.value }],
+    transform: [{ translateX: offset.value }, { scale: thumbScale.value }],
   }));
 
   const fillStyle = useAnimatedStyle(() => ({
-    width: x.value + FILL_ADJUST,
+    width: offset.value,
   }));
 
-  const handleLayout = (event: LayoutChangeEvent) => {
-    const width = event.nativeEvent.layout.width;
-    setTrackWidth(width);
-  };
-
   return (
-    <GestureDetector gesture={tapGesture}>
-      <View style={globalStyles.sliderWrapper}>
-        <View style={globalStyles.sliderTrack} onLayout={handleLayout}>
-          <Animated.View style={[globalStyles.sliderFill, fillStyle]} />
-          <GestureDetector gesture={gesture}>
-            <Animated.View
-              style={[
-                globalStyles.sliderThumb,
-                { width: THUMB_SIZE, height: THUMB_SIZE, borderRadius: THUMB_SIZE / 2 },
-                thumbStyle,
-              ]}
-            />
-          </GestureDetector>
-        </View>
+    <View style={globalStyles.sliderWrapper}>
+      <View style={globalStyles.sliderTrack} onLayout={handleLayout}>
+        <Animated.View style={[globalStyles.sliderFill, fillStyle]} />
+        <PanGestureHandler
+          onGestureEvent={handleGestureActive}
+          onBegan={handleGestureStart}
+          onEnded={handleGestureEnd}
+        >
+           <Animated.View
+    style={[
+      globalStyles.sliderHitbox,
+      {
+        width: HITBOX_SIZE,
+        height: HITBOX_SIZE,
+        top: -(HITBOX_SIZE - THUMB_SIZE) / 2 - 2,
+        left: -(HITBOX_SIZE - THUMB_SIZE) / 2,
+      },
+      thumbStyle,
+    ]}
+  >
+    <View
+      style={[
+        globalStyles.sliderThumb,
+        {
+          width: THUMB_SIZE,
+          height: THUMB_SIZE,
+          borderRadius: THUMB_SIZE / 2 ,
+        },
+      ]}
+    />
+  </Animated.View>
+        </PanGestureHandler>
       </View>
-    </GestureDetector>
+    </View>
   );
 }

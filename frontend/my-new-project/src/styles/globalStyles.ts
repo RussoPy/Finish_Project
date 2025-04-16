@@ -80,12 +80,19 @@ const globalStyles = StyleSheet.create({
     top: 0,
   },
   sliderThumb: {
-    width: 18,
-    height: 18,
     backgroundColor: colors.primary,
-    borderRadius: 30,
+  },
+  sliderValue: {
+    marginTop: 12,
+    textAlign: 'center',
+    color: colors.primary,
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  sliderHitbox: {
     position: 'absolute',
-    top: -7,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   
 });

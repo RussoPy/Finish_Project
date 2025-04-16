@@ -1,4 +1,3 @@
-// src/auth/LoginScreen.tsx
 import { useState, useRef, useEffect } from 'react';
 import {
   TextInput as RNTextInput,
@@ -9,12 +8,18 @@ import {
   ActivityIndicator,
   Pressable,
   Switch,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import { styled } from 'nativewind';
 import { AppButton } from '../components/AppButton';
 import { useAuth } from './useAuth';
 import Toast from 'react-native-toast-message';
 import { Feather } from '@expo/vector-icons';
+
+import colors from '../styles/colors';
+import globalStyles from '../styles/globalStyles';
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -68,78 +73,101 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <Animated.View
-      style={{
-        flex: 1,
-        backgroundColor: '#f0f9ff',
-        padding: 20,
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        justifyContent: 'center',
-      }}
+    <KeyboardAvoidingView
+      style={globalStyles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View className="mb-8">
-        <Text className="text-3xl font-extrabold text-blue-600 text-center">Welcome Back</Text>
-        <Text className="text-base text-blue-800 text-center mt-2">Login to your Flowjob account</Text>
-      </View>
-
-      <TextInput
-        className="bg-white p-3 rounded-xl mb-4 border border-blue-200"
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <View className="flex-row items-center border border-blue-200 rounded-xl px-3 mb-2 bg-white">
-        <TextInput
-          className="flex-1 py-3"
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-        />
-        <Pressable onPress={() => setShowPassword(!showPassword)}>
-          <Feather
-            name={showPassword ? 'eye' : 'eye-off'}
-            size={20}
-            color="#64748b"
-          />
-        </Pressable>
-      </View>
-
-      <View className="flex-row items-center justify-between mb-2">
-        <View className="flex-row items-center">
-          <Switch
-            value={rememberMe}
-            onValueChange={setRememberMe}
-            trackColor={{ false: '#cbd5e1', true: '#38bdf8' }}
-            thumbColor={rememberMe ? '#0ea5e9' : '#f1f5f9'}
-          />
-          <Text className="ml-2 text-slate-700">Remember Me</Text>
-        </View>
-
-        {loading && (
-          <ActivityIndicator size="small" color="#0ea5e9" />
-        )}
-      </View>
-
-      <AppButton
-        title="Login"
-        onPress={handleLogin}
-        
-      />
-
-      <Text className="mt-6 text-center text-blue-700">
-        Don’t have an account?{' '}
-        <Text
-          onPress={() => navigation.navigate('Register')}
-          className="text-indigo-600 font-bold"
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Animated.View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }}
         >
-          Register
-        </Text>
-      </Text>
-    </Animated.View>
+          <View>
+            <Text style={globalStyles.title}>Welcome Back</Text>
+            <Text style={{ textAlign: 'center', color: colors.info, marginBottom: 24 }}>
+              Login to your Flowjob account
+            </Text>
+          </View>
+
+          <TextInput
+            placeholder="Email"
+            placeholderTextColor={colors.info}
+            style={[globalStyles.input, {
+              backgroundColor: 'white',
+              padding: 14,
+              borderWidth: 1,
+              borderColor: colors.muted,
+            }]}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <View style={[
+            globalStyles.input,
+            {
+              backgroundColor: 'white',
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 14,
+              borderWidth: 1,
+              borderColor: colors.muted,
+            }
+          ]}>
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor={colors.info}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              style={{ flex: 1, paddingVertical: 14 }}
+            />
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <Feather
+                name={showPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color={colors.info}
+              />
+            </Pressable>
+          </View>
+
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: 8,
+            marginBottom: 16,
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Switch
+                value={rememberMe}
+                onValueChange={setRememberMe}
+                trackColor={{ false: colors.muted, true: colors.secondary }}
+                thumbColor={rememberMe ? colors.primary : '#f1f5f9'}
+              />
+              <Text style={{ marginLeft: 8, color: colors.info }}>Remember Me</Text>
+            </View>
+            {loading && <ActivityIndicator size="small" color={colors.primary} />}
+          </View>
+
+          <AppButton title="Login" onPress={handleLogin} />
+
+          <Text style={{ marginTop: 40, textAlign: 'center', color: colors.primary }}>
+            Don’t have an account?{' '}
+            <Text
+              onPress={() => navigation.navigate('Register')}
+              style={globalStyles.highlightText}
+            >
+              Register
+            </Text>
+          </Text>
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

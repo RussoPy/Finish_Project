@@ -60,7 +60,7 @@ export default function ProfilePictureStep() {
   };
 
   return (
-    <View style={[globalStyles.container, { justifyContent: 'flex-start' }]}>
+    <View style={[globalStyles.container, { justifyContent: 'center' , alignItems: 'center' }]}>
       {/* 🔙 Header with Progress */}
       <ProfileNavHeader
         stepText="3/10"
