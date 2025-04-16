@@ -28,26 +28,32 @@ export default function AvailabilityEditor({ value = [], onChange }: {
             key={opt}
             onPress={() => toggle(opt)}
             style={{
-              borderRadius: 16,
               paddingVertical: 12,
               paddingHorizontal: 20,
-              marginBottom: spacing.s,
+              borderRadius: 9999,
+              marginRight: 8,
+              marginBottom: 8,
+              minWidth: 300, // ✅ Force pills to be longer
+              justifyContent: 'center',
               backgroundColor: selected ? colors.primary : '#fff',
-              borderWidth: 1,
+              borderWidth: 1.5,
               borderColor: selected ? colors.primary : colors.muted,
-              alignItems: 'center',
+              alignSelf: 'center',
             }}
           >
-            <Text
-              style={{
-                color: selected ? '#fff' : colors.primary,
-                fontWeight: '600',
-                fontSize: 16,
-              }}
-            >
+            <Text style={{
+              fontSize: 14,
+              fontWeight: '500',
+              textAlign: 'center',
+              color: selected ? '#fff' : colors.primary,
+            }}>
               {opt}
             </Text>
           </Pressable>
+
+
+
+
         );
       })}
     </View>

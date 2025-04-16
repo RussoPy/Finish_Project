@@ -19,29 +19,32 @@ export default function ExperienceEditor({
         const isSelected = value === opt;
         return (
           <Pressable
-            key={opt}
-            onPress={() => onChange(opt)}
-            style={{
-              borderRadius: 16,
-              paddingVertical: 14,
-              paddingHorizontal: 24,
-              marginBottom: spacing.s,
-              backgroundColor: isSelected ? colors.primary : '#fff',
-              borderWidth: 1,
-              borderColor: isSelected ? colors.primary : colors.muted,
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              style={{
-                color: isSelected ? '#fff' : colors.primary,
-                fontWeight: '600',
-                fontSize: 16,
-              }}
-            >
-              {opt}
-            </Text>
-          </Pressable>
+  key={opt}
+  onPress={() => onChange(opt)}
+  style={{
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 9999,
+    marginBottom: spacing.s,
+    minWidth: 300, // Match long-pill width
+    justifyContent: 'center',
+    alignSelf: 'center',
+    backgroundColor: isSelected ? colors.primary : '#fff',
+    borderWidth: 1.5,
+    borderColor: isSelected ? colors.primary : colors.muted,
+  }}
+>
+  <Text
+    style={{
+      color: isSelected ? '#fff' : colors.primary,
+      fontWeight: '600',
+      fontSize: 16,
+      textAlign: 'center',
+    }}
+  >
+    {opt}
+  </Text>
+</Pressable>
         );
       })}
     </View>

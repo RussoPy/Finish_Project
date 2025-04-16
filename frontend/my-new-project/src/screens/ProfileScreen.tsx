@@ -7,6 +7,7 @@ import {
   Platform,
   UIManager,
   Image,
+  TextInput,
 } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { auth, db } from '../api/firebase';
@@ -20,6 +21,7 @@ import ExperienceEditor from './editors/ExperienceEditor';
 import SalaryEditor from './editors/SalaryEditor';
 import { useNavigation } from '@react-navigation/native';
 import { GOOGLE_MAPS_API_KEY } from '@env';
+import Icon from 'react-native-vector-icons/Feather';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -31,8 +33,8 @@ type ProfileForm = {
   preferred_tags: string[];
   preferences: string[];
   skills: string[];
-  salary_min: number | string;
-  salary_max: number | string;
+  salary_min: string;
+  salary_max: string;
   salary_unit: 'hour' | 'month';
 };
 
@@ -86,6 +88,33 @@ async function getReadableAddress(lat: number, lng: number): Promise<string> {
     return `(${lat.toFixed(3)}, ${lng.toFixed(3)})`;
   }
 }
+
+const SettingsItem = ({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: string;
+  label: string;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderColor: '#eee',
+      backgroundColor: '#fff',
+    }}
+  >
+    <Icon name={icon} size={20} color="#333" />
+    <Text style={{ marginLeft: 16, fontSize: 16, flex: 1 }}>{label}</Text>
+    <Icon name="chevron-right" size={20} color="#999" />
+  </TouchableOpacity>
+);
 
 export default function ProfileScreen() {
   const [data, setData] = useState<any>(null);
@@ -169,118 +198,114 @@ export default function ProfileScreen() {
     : '—';
 
   return (
-    <>
-      <ScrollView style={{ padding: spacing.l, backgroundColor: '#f5f5f5' }}>
-        <View
+    <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
+      <View
+        style={{
+          backgroundColor: '#fff',
+          paddingHorizontal: 20,
+          paddingVertical: 24,
+          borderBottomWidth: 1,
+          borderColor: '#eee',
+        }}
+      >
+        <Text
           style={{
-            backgroundColor: '#fff',
-            padding: spacing.l,
-            borderRadius: 12,
-            marginBottom: spacing.xl,
-            alignItems: 'center',
+            fontSize: 24,
+            fontWeight: '700',
+            marginBottom: 25,
+            marginTop: 25,
+            textAlign: 'center',
+            color: "#000000",
+            letterSpacing: 0.5,
           }}
         >
-          {data.profileImage && (
+          Settings
+        </Text>        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {data?.profileImage && (
             <Image
               source={{ uri: data.profileImage }}
-              style={{ width: 100, height: 100, borderRadius: 50, marginBottom: 10 }}
+              style={{ width: 64, height: 64, borderRadius: 32, marginRight: 16 }}
             />
           )}
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-            {auth.currentUser?.displayName || 'User'}
-          </Text>
-          <Text style={{ color: '#666', marginTop: 4 }}>
-            Age: {age} | Location: {locationText || 'Unknown'}
-          </Text>
+          <View>
+            <Text style={{ fontSize: 16, fontWeight: '600' }}>{auth.currentUser?.displayName || 'User'}</Text>
+            <Text style={{ color: '#666', marginTop: 4 }}>
+              Age: {age} | {locationText || 'Unknown'}
+            </Text>
+          </View>
         </View>
 
-        {/* Inline editable sections */}
-        <Section title="Availability" expanded={expanded === 'availability'} onToggle={() => handleToggle('availability')}>
+      </View>
+
+      <ScrollView style={{ flex: 1 }}>
+        <SettingsItem icon="calendar" label="Availability" onPress={() => handleToggle('availability')} />
+        {expanded === 'availability' && (
           <AvailabilityEditor
             value={form.availability}
-            onChange={(val: string[]) => setForm((prev) => ({ ...prev, availability: val }))}
+            onChange={(val) => setForm((prev) => ({ ...prev, availability: val }))}
           />
-        </Section>
+        )}
 
-        <Section title="Experience" expanded={expanded === 'experience'} onToggle={() => handleToggle('experience')}>
+        <SettingsItem icon="briefcase" label="Experience" onPress={() => handleToggle('experience')} />
+        {expanded === 'experience' && (
           <ExperienceEditor
             value={form.experience_level}
-            onChange={(val: string) => setForm((prev) => ({ ...prev, experience_level: val }))}
+            onChange={(val) => setForm((prev) => ({ ...prev, experience_level: val }))}
           />
-        </Section>
+        )}
 
-        {/* Full-screen modal editors */}
-        <Section title="Industry" expanded={false} onToggle={() =>
+        <SettingsItem icon="layers" label="Industry" onPress={() =>
           navigation.navigate('EditIndustry', {
             currentIndustries: form.preferred_tags,
-            onSave: (val: string[]) =>
-              setForm((prev) => ({ ...prev, preferred_tags: val })),
+            onSave: (val: string[]) => setForm((prev) => ({ ...prev, preferred_tags: val })),
           })
-        }>
-          <Text>{form.preferred_tags.length} selected</Text>
-        </Section>
+        } />
 
-        <Section title="Tags" expanded={false} onToggle={() =>
+        <SettingsItem icon="tag" label="Tags" onPress={() =>
           navigation.navigate('EditTags', {
             currentTags: form.preferences,
-            onSave: (val: string[]) =>
-              setForm((prev) => ({ ...prev, preferences: val })),
+            onSave: (val: string[]) => setForm((prev) => ({ ...prev, preferences: val })),
           })
-        }>
-          <Text>{form.preferences.length} selected</Text>
-        </Section>
+        } />
 
-        <Section title="Skills" expanded={false} onToggle={() =>
+        <SettingsItem icon="sliders" label="Skills" onPress={() =>
           navigation.navigate('EditSkills', {
             currentSkills: form.skills,
-            onSave: (val: string[]) =>
-              setForm((prev) => ({ ...prev, skills: val })),
+            onSave: (val: string[]) => setForm((prev) => ({ ...prev, skills: val })),
           })
-        }>
-          <Text>{form.skills.length} selected</Text>
-        </Section>
+        } />
 
-        <Section title="Salary" expanded={expanded === 'salary'} onToggle={() => handleToggle('salary')}>
-        <SalaryEditor
-  min={form.salary_min}
-  max={form.salary_max}
-  unit={form.salary_unit}
-  onChange={({
-    min,
-    max,
-    unit,
-  }: {
-    min: string;
-    max: string;
-    unit: 'hour' | 'month';
-  }) =>
-    setForm((prev) => ({
-      ...prev,
-      salary_min: min,
-      salary_max: max,
-      salary_unit: unit,
-    }))
-  }
-/>
-        </Section>
+        <SettingsItem icon="dollar-sign" label="Salary" onPress={() => handleToggle('salary')} />
+        {expanded === 'salary' && (
+          <SalaryEditor
+            min={form.salary_min}
+            max={form.salary_max}
+            unit={form.salary_unit}
+            onChange={({ min, max, unit }: { min: string; max: string; unit: 'hour' | 'month' }) =>
+              setForm((prev) => ({
+                ...prev,
+                salary_min: min,
+                salary_max: max,
+                salary_unit: unit,
+              }))
+            }
+          />
+        )}
 
-        <Button
-          mode="contained"
-          onPress={handleSaveAll}
-          style={{
-            marginTop: spacing.xl,
-            marginBottom: 60,
-            backgroundColor: colors.primary,
-            borderRadius: 12,
-          }}
-          contentStyle={globalStyles.buttonContent}
-          labelStyle={{ fontWeight: '600', color: 'white' }}
-        >
-          Save All Changes
-        </Button>
+        <View style={{ padding: 20 }}>
+          <Button
+            mode="contained"
+            onPress={handleSaveAll}
+            style={{ backgroundColor: colors.primary, borderRadius: 12 }}
+            contentStyle={globalStyles.buttonContent}
+            labelStyle={{ fontWeight: '600', color: 'white' }}
+          >
+            Save All Changes
+          </Button>
+        </View>
       </ScrollView>
 
       <Toast />
-    </>
+    </View>
   );
 }
