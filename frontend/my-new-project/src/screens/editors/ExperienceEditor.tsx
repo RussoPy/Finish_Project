@@ -29,14 +29,15 @@ export default function ExperienceEditor({
     minWidth: 300, // Match long-pill width
     justifyContent: 'center',
     alignSelf: 'center',
-    backgroundColor: isSelected ? colors.primary : '#fff',
+    backgroundColor: isSelected ? '#81c9f0' : '#fff',
     borderWidth: 1.5,
     borderColor: isSelected ? colors.primary : colors.muted,
   }}
 >
   <Text
     style={{
-      color: isSelected ? '#fff' : colors.primary,
+      color: isSelected ? '#131414' : colors.primary,
+      fontFamily: 'Nunito_400Regular',
       fontWeight: '600',
       fontSize: 16,
       textAlign: 'center',

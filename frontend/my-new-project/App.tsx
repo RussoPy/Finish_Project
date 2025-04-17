@@ -14,7 +14,7 @@ import {
 } from '@expo-google-fonts/poetsen-one';
 import { RobotoMono_400Regular } from '@expo-google-fonts/roboto-mono';
 import { DancingScript_700Bold } from '@expo-google-fonts/dancing-script';
-import { BubblegumSans_400Regular } from '@expo-google-fonts/bubblegum-sans';
+import {  Nunito_400Regular,Nunito_700Bold, } from '@expo-google-fonts/nunito';
 
 import AppLoading from 'expo-app-loading';
 
@@ -37,7 +37,8 @@ export default function App() {
     PoetsenOne_400Regular,
     RobotoMono_400Regular,
     DancingScript_700Bold,
-    BubblegumSans_400Regular,
+    Nunito_400Regular,
+    Nunito_700Bold,
   });
 
   if (!fontsLoaded) {

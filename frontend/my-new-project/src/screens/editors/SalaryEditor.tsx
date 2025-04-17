@@ -16,9 +16,17 @@ export default function SalaryEditor({
   onChange: (vals: { min: string; max: string; unit: 'hour' | 'month' }) => void;
 }) {
   return (
-    <View>
+    <View style={{ paddingTop: spacing.m }}>
       {/* 💰 Min Salary */}
-      <Text style={{ color: colors.primary, fontWeight: '600', marginBottom: 4 }}>
+      <Text
+        style={{
+          color: colors.primary,
+          fontFamily: 'Nunito_700Bold',
+          fontSize: 18,
+          textAlign: 'center',
+          marginBottom: 4,
+        }}
+      >
         Minimum Salary (₪)
       </Text>
       <TextInput
@@ -28,18 +36,29 @@ export default function SalaryEditor({
         onChangeText={(text) => onChange({ min: text, max: String(max), unit })}
         style={{
           height: 48,
-          backgroundColor: '#fff',
-          borderRadius: 12,
+          backgroundColor: '#81c9f0',
+          borderRadius: 999,
           paddingHorizontal: spacing.m,
-          borderColor: colors.muted,
-          borderWidth: 1,
+          borderColor: 'transparent',
+          borderWidth: 1.5,
           textAlign: 'center',
+          fontFamily: 'Nunito_400Regular',
+          fontSize: 16,
+          color: '#222',
           marginBottom: spacing.m,
         }}
       />
 
       {/* 💰 Max Salary */}
-      <Text style={{ color: colors.primary, fontWeight: '600', marginBottom: 4 }}>
+      <Text
+        style={{
+          color: colors.primary,
+          fontFamily: 'Nunito_700Bold',
+          fontSize: 18,
+          textAlign: 'center',
+          marginBottom: 4,
+        }}
+      >
         Maximum Salary (₪)
       </Text>
       <TextInput
@@ -49,21 +68,38 @@ export default function SalaryEditor({
         onChangeText={(text) => onChange({ min: String(min), max: text, unit })}
         style={{
           height: 48,
-          backgroundColor: '#fff',
-          borderRadius: 12,
+          backgroundColor: '#81c9f0',
+          borderRadius: 999,
           paddingHorizontal: spacing.m,
-          borderColor: colors.muted,
-          borderWidth: 1,
+          borderColor: 'transparent',
+          borderWidth: 1.5,
           textAlign: 'center',
+          fontFamily: 'Nunito_400Regular',
+          fontSize: 16,
+          color: '#222',
           marginBottom: spacing.m,
         }}
       />
 
       {/* ⏱ Unit Toggle */}
-      <Text style={{ color: colors.primary, fontWeight: '600', marginBottom: spacing.s }}>
+      <Text
+        style={{
+          color: colors.primary,
+          fontFamily: 'Nunito_700Bold',
+          fontSize: 18,
+          textAlign: 'center',
+          marginBottom: spacing.s,
+        }}
+      >
         Salary Unit
       </Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: spacing.m }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          marginBottom: spacing.m,
+        }}
+      >
         {['hour', 'month'].map((u) => {
           const isActive = unit === u;
           return (
@@ -72,15 +108,21 @@ export default function SalaryEditor({
               onPress={() => onChange({ min: String(min), max: String(max), unit: u as 'hour' | 'month' })}
               style={{
                 paddingVertical: 10,
-                paddingHorizontal: 20,
-                backgroundColor: isActive ? colors.primary : '#fff',
-                borderWidth: 1,
-                borderColor: isActive ? colors.primary : colors.muted,
-                borderRadius: 12,
-                marginHorizontal: 4,
+                paddingHorizontal: 24,
+                backgroundColor: isActive ? colors.primary : '#81c9f0',
+                borderWidth: 1.5,
+                borderColor: isActive ? colors.primary : '#81c9f0',
+                borderRadius: 999,
+                marginHorizontal: 6,
               }}
             >
-              <Text style={{ color: isActive ? '#fff' : colors.primary, fontWeight: '600' }}>
+              <Text
+                style={{
+                  color: isActive ? '#fff' : '#222',
+                  fontFamily: 'Nunito_400Regular',
+                  fontSize: 15,
+                }}
+              >
                 Per {u.charAt(0).toUpperCase() + u.slice(1)}
               </Text>
             </Pressable>
