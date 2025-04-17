@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ProfileScreen from './ProfileScreen';
-import MatchScreen from './MatchScreen';
+import JobMatchScreen from './JobMatchScreen';
 import ChatScreen from './ChatScreen';
 
 export default function HomeScreen() {
@@ -15,7 +15,7 @@ export default function HomeScreen() {
       case 'chat':
         return <ChatScreen />;
       default:
-        return <MatchScreen />;
+        return <JobMatchScreen />;
     }
   };
 

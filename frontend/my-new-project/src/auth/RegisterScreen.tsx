@@ -7,7 +7,10 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  View,
+  Pressable,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import { signInWithPhoneNumber } from 'firebase/auth';
@@ -104,39 +107,44 @@ export default function RegisterScreen({ navigation }: any) {
   };
 
   return (
-    <KeyboardAvoidingView
-    style={globalStyles.container}
-    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-  >
-    <FirebaseRecaptchaVerifierModal ref={recaptchaVerifier} firebaseConfig={firebaseConfig} />
 
-    {step === Step.ProfileForm ? (
-      // Let RegisterForm control its own full layout and styling
-      <RegisterForm phone={phone} navigation={navigation} />
-    ) : (
+    <KeyboardAvoidingView
+      style={globalStyles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* ⬅️ Back Arrow */}
+      <View style={{ position: 'absolute', top: 30, left: 10, zIndex: 100 }}>
+        <Pressable onPress={() => navigation.goBack()}>
+          <Feather name="arrow-left" size={24} color={colors.primary} />
+        </Pressable>
+      </View>
+
+      <FirebaseRecaptchaVerifierModal ref={recaptchaVerifier} firebaseConfig={firebaseConfig} />
+
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: 'center',
+          justifyContent: step === Step.ProfileForm ? 'flex-start' : 'center',
           alignItems: 'center',
           paddingHorizontal: 20,
+          paddingTop: step === Step.ProfileForm ? 60 : 0,
         }}
+        keyboardShouldPersistTaps="handled"
       >
         <Animated.View
           style={{
             width: '100%',
-            alignItems: 'center',
+            alignItems: step === Step.ProfileForm ? 'stretch' : 'center',
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }}
         >
           {renderStep()}
-          {loading && (
+          {loading && step !== Step.ProfileForm && (
             <ActivityIndicator style={{ marginTop: 20 }} size="small" color={colors.primary} />
           )}
         </Animated.View>
       </ScrollView>
-    )}
-  </KeyboardAvoidingView>
+    </KeyboardAvoidingView>
   );
 }

@@ -82,7 +82,6 @@ export default function RegisterForm({ navigation, phone }: any) {
 
       setTimeout(() => {
         Toast.show({ type: 'success', text1: 'Account created 🎉' });
-        navigation.navigate('Login');
       }, 500);
     } catch (err: any) {
       Toast.show({ type: 'error', text1: 'Error creating account', text2: err.message });
