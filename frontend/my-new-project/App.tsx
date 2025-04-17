@@ -7,8 +7,14 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import colors from './src/styles/colors';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { useFonts as usePoetsenFonts, PoetsenOne_400Regular } from '@expo-google-fonts/poetsen-one';
-import { useFonts as useRobotoMonoFonts, RobotoMono_400Regular } from '@expo-google-fonts/roboto-mono';
+import { useFonts } from 'expo-font';
+import {
+  PoetsenOne_400Regular,
+  useFonts as usePoetsenFonts,
+} from '@expo-google-fonts/poetsen-one';
+import { RobotoMono_400Regular } from '@expo-google-fonts/roboto-mono';
+import { DancingScript_700Bold } from '@expo-google-fonts/dancing-script';
+import { BubblegumSans_400Regular } from '@expo-google-fonts/bubblegum-sans';
 
 import AppLoading from 'expo-app-loading';
 
@@ -27,9 +33,11 @@ const theme = {
 };
 
 export default function App() {
-  const [fontsLoaded] = usePoetsenFonts({
+  const [fontsLoaded] = useFonts({
     PoetsenOne_400Regular,
     RobotoMono_400Regular,
+    DancingScript_700Bold,
+    BubblegumSans_400Regular,
   });
 
   if (!fontsLoaded) {

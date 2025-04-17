@@ -20,6 +20,8 @@ import { Feather } from '@expo/vector-icons';
 
 import colors from '../styles/colors';
 import globalStyles from '../styles/globalStyles';
+import { Image } from 'react-native';
+
 
 const View = styled(RNView);
 const Text = styled(RNText);
@@ -86,12 +88,31 @@ export default function LoginScreen({ navigation }: any) {
             transform: [{ translateY: slideAnim }],
           }}
         >
-          <View>
-            <Text style={globalStyles.title}>Welcome Back</Text>
-            <Text style={{ textAlign: 'center', color: colors.info, marginBottom: 24 }}>
-              Login to your Flowjob account
-            </Text>
-          </View>
+          <View style={{ alignItems: 'center' }}>
+  <Image
+    source={require('../assets/icon.png')}
+    style={{
+      width: 110,
+    height: 110,
+    marginBottom: 28,
+    borderRadius: 24,
+    }}
+    resizeMode="contain"
+  />
+<Text
+  style={{
+    fontFamily: 'BubblegumSans_400Regular',
+    fontSize: 32,
+    textAlign: 'center',
+    color: colors.primary,
+  }}
+>
+  Welcome Back
+</Text>
+<Text style={{ textAlign: 'center', color: colors.info, marginBottom: 24 }}>
+    Login to your Flowjob account
+  </Text>
+</View>
 
           <TextInput
             placeholder="Email"

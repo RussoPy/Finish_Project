@@ -9,6 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/bubblegum-sans": "^0.3.0",
+    "@expo-google-fonts/dancing-script": "^0.3.0",
     "@expo-google-fonts/poetsen-one": "^0.3.0",
     "@expo-google-fonts/roboto-mono": "^0.3.0",
     "@react-native-community/checkbox": "^0.5.17",
