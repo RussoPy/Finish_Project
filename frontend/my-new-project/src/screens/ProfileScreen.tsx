@@ -22,6 +22,10 @@ import SalaryEditor from './editors/SalaryEditor';
 import { useNavigation } from '@react-navigation/native';
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import Icon from 'react-native-vector-icons/Feather';
+import ProfileImageEditor from './editors/ProfileImageEditor';
+import { signOut } from 'firebase/auth';
+
+
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -201,40 +205,86 @@ export default function ProfileScreen() {
     <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
       <View
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: '#81c9f0',
           paddingHorizontal: 20,
           paddingVertical: 24,
           borderBottomWidth: 1,
           borderColor: '#eee',
+          alignItems: 'center',
         }}
       >
+        <TouchableOpacity
+          onPress={() => signOut(auth)}
+          style={{
+            position: 'absolute',
+            top: 54,
+            left: 20,
+            backgroundColor: '#fff',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 999,
+            borderWidth: 1,
+            borderColor: '#ccc',
+            zIndex: 10,
+          }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>Logout</Text>
+        </TouchableOpacity>
         <Text
           style={{
-            fontSize: 24,
-            fontWeight: '700',
+            fontSize: 22,
+            fontFamily: 'PoetsenOne_400Regular',
             marginBottom: 25,
-            marginTop: 25,
+            marginTop: 30,
             textAlign: 'center',
-            color: "#000000",
-            letterSpacing: 0.5,
+            color: '#222222',
+            letterSpacing: 0.3,
           }}
         >
           Settings
-        </Text>        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {data?.profileImage && (
-            <Image
-              source={{ uri: data.profileImage }}
-              style={{ width: 64, height: 64, borderRadius: 32, marginRight: 16 }}
-            />
-          )}
-          <View>
-            <Text style={{ fontSize: 16, fontWeight: '600' }}>{auth.currentUser?.displayName || 'User'}</Text>
-            <Text style={{ color: '#666', marginTop: 4 }}>
-              Age: {age} | {locationText || 'Unknown'}
-            </Text>
+        </Text>
+
+        <View style={{ position: 'relative', marginBottom: 16 }}>
+          <ProfileImageEditor
+            imageUri={data?.profileImage}
+            onChange={(url: string) =>
+              setData((prev: any) => ({ ...prev, profileImage: url }))
+            }
+          />
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              backgroundColor: '#fff',
+              borderRadius: 12,
+              padding: 8,
+              elevation: 3,
+            }}
+          >
+            <Icon name="upload" size={14} color="#333" />
           </View>
         </View>
 
+        <Text style={{ fontSize: 20, fontWeight: '700', color: '#222', fontFamily: 'PoetsenOne_400Regular', }}>
+          {data?.firstName} {data?.lastName}
+        </Text>
+
+        <Text style={{ color: '#666', marginTop: 6, fontFamily: 'PoetsenOne_400Regular', }}>Age: {age}</Text>
+        <Text
+          style={{
+            color: '#666',
+            fontFamily: 'PoetsenOne_400Regular',
+            fontSize: 13,
+            marginTop: 2,
+            textAlign: 'center',
+            paddingHorizontal: 16,
+          }}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
+          {locationText || 'Unknown location'}
+        </Text>
       </View>
 
       <ScrollView style={{ flex: 1 }}>
@@ -296,9 +346,27 @@ export default function ProfileScreen() {
           <Button
             mode="contained"
             onPress={handleSaveAll}
-            style={{ backgroundColor: colors.primary, borderRadius: 12 }}
-            contentStyle={globalStyles.buttonContent}
-            labelStyle={{ fontWeight: '600', color: 'white' }}
+            style={{
+              backgroundColor: '#81c9f0',
+              borderRadius: 20,
+              alignSelf: 'center',
+              paddingHorizontal: 32,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 4,
+              elevation: 8,
+            }}
+            contentStyle={{
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+            }}
+            labelStyle={{
+              fontFamily: 'RobotoMono_400Regular',
+              fontWeight: '600',
+              color: 'black',
+              fontSize: 16,
+            }}
           >
             Save All Changes
           </Button>

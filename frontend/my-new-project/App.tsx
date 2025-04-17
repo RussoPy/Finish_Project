@@ -7,6 +7,17 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import colors from './src/styles/colors';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { useFonts } from 'expo-font';
+import {
+  PoetsenOne_400Regular,
+  useFonts as usePoetsenFonts,
+} from '@expo-google-fonts/poetsen-one';
+import { RobotoMono_400Regular } from '@expo-google-fonts/roboto-mono';
+import { DancingScript_700Bold } from '@expo-google-fonts/dancing-script';
+import { BubblegumSans_400Regular } from '@expo-google-fonts/bubblegum-sans';
+
+import AppLoading from 'expo-app-loading';
+
 const theme = {
   roundness: 12,
   colors: {
@@ -18,21 +29,28 @@ const theme = {
     placeholder: colors.info,
     error: colors.error,
     disabled: '#b0bec5',
-    
-    
   },
 };
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    PoetsenOne_400Regular,
+    RobotoMono_400Regular,
+    DancingScript_700Bold,
+    BubblegumSans_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
+
   return (
-    <>
-     <GestureHandlerRootView style={{ flex: 1 }}>
-       <PaperProvider theme={theme}>
-         <AppNavigator />
-         <Toast />
-         <StatusBar style="dark" />
-       </PaperProvider>
-     </GestureHandlerRootView>
-    </>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PaperProvider theme={theme}>
+        <AppNavigator />
+        <Toast />
+        <StatusBar style="dark" />
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 }
