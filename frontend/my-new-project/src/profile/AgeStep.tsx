@@ -119,7 +119,7 @@ export default function BirthDateStep() {
 
       {/* Title */}
       <Text style={globalStyles.title}>
-        your <Text style={globalStyles.highlightText}>b-day?</Text>
+        Your <Text style={globalStyles.highlightText}>b-day?</Text>
       </Text>
 
       {/* Input */}
