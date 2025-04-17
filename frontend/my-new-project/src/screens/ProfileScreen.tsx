@@ -22,6 +22,8 @@ import SalaryEditor from './editors/SalaryEditor';
 import { useNavigation } from '@react-navigation/native';
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import Icon from 'react-native-vector-icons/Feather';
+import ProfileImageEditor from './editors/ProfileImageEditor';
+
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -197,115 +199,162 @@ export default function ProfileScreen() {
     ? calculateAge(new Date(data.birth_date.seconds * 1000))
     : '—';
 
-  return (
-    <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
-      <View
-        style={{
-          backgroundColor: '#fff',
-          paddingHorizontal: 20,
-          paddingVertical: 24,
-          borderBottomWidth: 1,
-          borderColor: '#eee',
-        }}
-      >
-        <Text
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
+        <View
           style={{
-            fontSize: 24,
-            fontWeight: '700',
-            marginBottom: 25,
-            marginTop: 25,
-            textAlign: 'center',
-            color: "#000000",
-            letterSpacing: 0.5,
+            backgroundColor: '#81c9f0',
+            paddingHorizontal: 20,
+            paddingVertical: 24,
+            borderBottomWidth: 1,
+            borderColor: '#eee',
+            alignItems: 'center',
           }}
         >
-          Settings
-        </Text>        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {data?.profileImage && (
-            <Image
-              source={{ uri: data.profileImage }}
-              style={{ width: 64, height: 64, borderRadius: 32, marginRight: 16 }}
+          <Text
+  style={{
+    fontSize: 22,
+    fontFamily: 'PoetsenOne_400Regular',
+    marginBottom: 25,
+    marginTop: 30,
+    textAlign: 'center',
+    color: '#222222',
+    letterSpacing: 0.3,
+  }}
+>
+  Settings
+</Text>
+    
+          <View style={{ position: 'relative', marginBottom: 16 }}>
+            <ProfileImageEditor
+              imageUri={data?.profileImage}
+              onChange={(url: string) =>
+                setData((prev: any) => ({ ...prev, profileImage: url }))
+              }
+            />
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                backgroundColor: '#fff',
+                borderRadius: 12,
+                padding: 8,
+                elevation: 3,
+              }}
+            >
+              <Icon name="upload" size={14} color="#333" />
+            </View>
+          </View>
+    
+          <Text style={{ fontSize: 20, fontWeight: '700', color: '#222',fontFamily: 'PoetsenOne_400Regular', }}>
+            {data?.firstName} {data?.lastName}
+          </Text>
+    
+          <Text style={{ color: '#666', marginTop: 6,fontFamily: 'PoetsenOne_400Regular', }}>Age: {age}</Text>
+          <Text
+            style={{
+              color: '#666',
+              fontFamily: 'PoetsenOne_400Regular',
+              fontSize: 13,
+              marginTop: 2,
+              textAlign: 'center',
+              paddingHorizontal: 16,
+            }}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {locationText || 'Unknown location'}
+          </Text>
+        </View>
+    
+        <ScrollView style={{ flex: 1 }}>
+          <SettingsItem icon="calendar" label="Availability" onPress={() => handleToggle('availability')} />
+          {expanded === 'availability' && (
+            <AvailabilityEditor
+              value={form.availability}
+              onChange={(val) => setForm((prev) => ({ ...prev, availability: val }))}
             />
           )}
-          <View>
-            <Text style={{ fontSize: 16, fontWeight: '600' }}>{auth.currentUser?.displayName || 'User'}</Text>
-            <Text style={{ color: '#666', marginTop: 4 }}>
-              Age: {age} | {locationText || 'Unknown'}
-            </Text>
+    
+          <SettingsItem icon="briefcase" label="Experience" onPress={() => handleToggle('experience')} />
+          {expanded === 'experience' && (
+            <ExperienceEditor
+              value={form.experience_level}
+              onChange={(val) => setForm((prev) => ({ ...prev, experience_level: val }))}
+            />
+          )}
+    
+          <SettingsItem icon="layers" label="Industry" onPress={() =>
+            navigation.navigate('EditIndustry', {
+              currentIndustries: form.preferred_tags,
+              onSave: (val: string[]) => setForm((prev) => ({ ...prev, preferred_tags: val })),
+            })
+          } />
+    
+          <SettingsItem icon="tag" label="Tags" onPress={() =>
+            navigation.navigate('EditTags', {
+              currentTags: form.preferences,
+              onSave: (val: string[]) => setForm((prev) => ({ ...prev, preferences: val })),
+            })
+          } />
+    
+          <SettingsItem icon="sliders" label="Skills" onPress={() =>
+            navigation.navigate('EditSkills', {
+              currentSkills: form.skills,
+              onSave: (val: string[]) => setForm((prev) => ({ ...prev, skills: val })),
+            })
+          } />
+    
+          <SettingsItem icon="dollar-sign" label="Salary" onPress={() => handleToggle('salary')} />
+          {expanded === 'salary' && (
+            <SalaryEditor
+              min={form.salary_min}
+              max={form.salary_max}
+              unit={form.salary_unit}
+              onChange={({ min, max, unit }: { min: string; max: string; unit: 'hour' | 'month' }) =>
+                setForm((prev) => ({
+                  ...prev,
+                  salary_min: min,
+                  salary_max: max,
+                  salary_unit: unit,
+                }))
+              }
+            />
+          )}
+    
+          <View style={{ padding: 20 }}>
+         <Button
+  mode="contained"
+  onPress={handleSaveAll}
+  style={{
+    backgroundColor: '#81c9f0',
+    borderRadius: 20,
+    alignSelf: 'center',
+    paddingHorizontal: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 8,
+  }}
+  contentStyle={{
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  }}
+  labelStyle={{
+    fontFamily: 'RobotoMono_400Regular',
+    fontWeight: '600',
+    color: 'black',
+    fontSize: 16,
+  }}
+>
+  Save All Changes
+</Button>
           </View>
-        </View>
-
+        </ScrollView>
+    
+        <Toast />
       </View>
-
-      <ScrollView style={{ flex: 1 }}>
-        <SettingsItem icon="calendar" label="Availability" onPress={() => handleToggle('availability')} />
-        {expanded === 'availability' && (
-          <AvailabilityEditor
-            value={form.availability}
-            onChange={(val) => setForm((prev) => ({ ...prev, availability: val }))}
-          />
-        )}
-
-        <SettingsItem icon="briefcase" label="Experience" onPress={() => handleToggle('experience')} />
-        {expanded === 'experience' && (
-          <ExperienceEditor
-            value={form.experience_level}
-            onChange={(val) => setForm((prev) => ({ ...prev, experience_level: val }))}
-          />
-        )}
-
-        <SettingsItem icon="layers" label="Industry" onPress={() =>
-          navigation.navigate('EditIndustry', {
-            currentIndustries: form.preferred_tags,
-            onSave: (val: string[]) => setForm((prev) => ({ ...prev, preferred_tags: val })),
-          })
-        } />
-
-        <SettingsItem icon="tag" label="Tags" onPress={() =>
-          navigation.navigate('EditTags', {
-            currentTags: form.preferences,
-            onSave: (val: string[]) => setForm((prev) => ({ ...prev, preferences: val })),
-          })
-        } />
-
-        <SettingsItem icon="sliders" label="Skills" onPress={() =>
-          navigation.navigate('EditSkills', {
-            currentSkills: form.skills,
-            onSave: (val: string[]) => setForm((prev) => ({ ...prev, skills: val })),
-          })
-        } />
-
-        <SettingsItem icon="dollar-sign" label="Salary" onPress={() => handleToggle('salary')} />
-        {expanded === 'salary' && (
-          <SalaryEditor
-            min={form.salary_min}
-            max={form.salary_max}
-            unit={form.salary_unit}
-            onChange={({ min, max, unit }: { min: string; max: string; unit: 'hour' | 'month' }) =>
-              setForm((prev) => ({
-                ...prev,
-                salary_min: min,
-                salary_max: max,
-                salary_unit: unit,
-              }))
-            }
-          />
-        )}
-
-        <View style={{ padding: 20 }}>
-          <Button
-            mode="contained"
-            onPress={handleSaveAll}
-            style={{ backgroundColor: colors.primary, borderRadius: 12 }}
-            contentStyle={globalStyles.buttonContent}
-            labelStyle={{ fontWeight: '600', color: 'white' }}
-          >
-            Save All Changes
-          </Button>
-        </View>
-      </ScrollView>
-
-      <Toast />
-    </View>
-  );
+    );
 }
