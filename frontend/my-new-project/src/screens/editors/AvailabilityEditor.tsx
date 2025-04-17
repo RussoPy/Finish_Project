@@ -35,17 +35,18 @@ export default function AvailabilityEditor({ value = [], onChange }: {
               marginBottom: 8,
               minWidth: 300, // ✅ Force pills to be longer
               justifyContent: 'center',
-              backgroundColor: selected ? colors.primary : '#fff',
+              backgroundColor: selected ? '#81c9f0' : '#fff',
               borderWidth: 1.5,
               borderColor: selected ? colors.primary : colors.muted,
               alignSelf: 'center',
             }}
           >
             <Text style={{
+              fontFamily: 'Nunito_400Regular',
               fontSize: 14,
               fontWeight: '500',
               textAlign: 'center',
-              color: selected ? '#fff' : colors.primary,
+              color: selected ? '#131414' : colors.primary,
             }}>
               {opt}
             </Text>

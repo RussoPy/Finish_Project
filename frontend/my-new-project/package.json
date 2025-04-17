@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo-google-fonts/bubblegum-sans": "^0.3.0",
     "@expo-google-fonts/dancing-script": "^0.3.0",
+    "@expo-google-fonts/nunito": "^0.3.0",
     "@expo-google-fonts/poetsen-one": "^0.3.0",
     "@expo-google-fonts/roboto-mono": "^0.3.0",
     "@react-native-community/checkbox": "^0.5.17",
@@ -48,8 +49,7 @@
     "tailwind-rn": "^4.2.0",
     "tailwindcss": "^3.3.2",
     "tailwindcss-react-native": "^1.7.10",
-    "uuid": "^11.1.0",
-    "react-native-webview": "13.12.5"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

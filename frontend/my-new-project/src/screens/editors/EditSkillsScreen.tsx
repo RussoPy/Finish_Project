@@ -10,33 +10,18 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import colors from '../../styles/colors';
 import spacing from '../../styles/spacing';
 
-const pastelColors = [
-    '#FFEBEE', '#FFF3E0', '#FFF8E1', '#E8F5E9', '#E3F2FD',
-    '#F3E5F5', '#E1F5FE', '#FBE9E7', '#F9FBE7', '#E0F2F1',
-  ];
-
 const allSkills: string[] = [
-    'JavaScript', 'React', 'CSS', 'Python', 'Node.js', 'SQL',
-    'Public Speaking', 'Customer Service', 'Leadership', 'Problem Solving',
-    'Excel', 'Copywriting', 'Photography', 'Teamwork', 'Project Management',
-    'Cooking', 'Sales', 'Marketing', 'HTML', 'Firebase', 'Figma'
-  ];
+  'JavaScript', 'React', 'CSS', 'Python', 'Node.js', 'SQL',
+  'Public Speaking', 'Customer Service', 'Leadership', 'Problem Solving',
+  'Excel', 'Copywriting', 'Photography', 'Teamwork', 'Project Management',
+  'Cooking', 'Sales', 'Marketing', 'HTML', 'Firebase', 'Figma'
+];
 
-
-  
 export default function EditSkillsScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const [skills, setSkills] = useState<string[]>(route.params?.currentSkills || []);
   const [search, setSearch] = useState('');
-
-  const getColorForOption = (label: string): string => {
-    let sum = 0;
-    for (let i = 0; i < label.length; i++) {
-      sum += label.charCodeAt(i);
-    }
-    return pastelColors[sum % pastelColors.length];
-  };
 
   const toggle = (skill: string) => {
     setSkills((prev) =>
@@ -47,9 +32,7 @@ export default function EditSkillsScreen() {
   };
 
   const handleSave = () => {
-    if (route.params?.onSave) {
-      route.params.onSave(skills);
-    }
+    route.params?.onSave?.(skills);
     navigation.goBack();
   };
 
@@ -60,10 +43,15 @@ export default function EditSkillsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
       <View style={{ padding: spacing.l }}>
-        <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: spacing.m }}>
+        <Text style={{
+          fontSize: 22,
+          fontWeight: 'bold',
+          fontFamily: 'Nunito_700Bold',
+          marginBottom: spacing.m
+        }}>
           Edit Your Skills
         </Text>
-  
+
         <TextInput
           placeholder="Search skills..."
           value={search}
@@ -79,7 +67,7 @@ export default function EditSkillsScreen() {
           }}
         />
       </View>
-  
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -88,11 +76,11 @@ export default function EditSkillsScreen() {
           justifyContent: 'flex-start',
           paddingHorizontal: spacing.l,
           gap: 8,
-          paddingBottom: 140, // enough space so last pills aren't hidden by the button
+          paddingBottom: 140,
         }}
       >
         {filtered.map((skill) => {
-          const selected = skills.includes(skill);
+          const isSelected = skills.includes(skill);
           return (
             <Pressable
               key={skill}
@@ -101,17 +89,17 @@ export default function EditSkillsScreen() {
                 paddingVertical: 8,
                 paddingHorizontal: 16,
                 borderRadius: 24,
-                backgroundColor: selected ? colors.primary : getColorForOption(skill),
-                borderWidth: 1,
-                borderColor: selected ? colors.primary : colors.muted,
+                backgroundColor: isSelected ? colors.primary : '#81c9f0',
+                borderWidth: 1.5,
+                borderColor: isSelected ? colors.primary : '#81c9f0',
                 margin: 4,
               }}
             >
               <Text
                 style={{
-                  color: selected ? '#fff' : colors.primary,
-                  fontSize: 14,
-                  fontWeight: '500',
+                  color: isSelected ? '#fff' : '#222',
+                  fontFamily: 'Nunito_400Regular',
+                  fontSize: 16,
                 }}
               >
                 {skill}
@@ -120,7 +108,7 @@ export default function EditSkillsScreen() {
           );
         })}
       </ScrollView>
-  
+
       <View style={{
         position: 'absolute',
         bottom: 30,
@@ -142,5 +130,4 @@ export default function EditSkillsScreen() {
       </View>
     </View>
   );
-  
 }
