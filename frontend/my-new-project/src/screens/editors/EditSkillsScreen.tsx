@@ -42,15 +42,17 @@ export default function EditSkillsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
-      <View style={{ padding: spacing.l }}>
-        <Text style={{
-          fontSize: 22,
-          fontWeight: 'bold',
-          fontFamily: 'Nunito_700Bold',
-          marginBottom: spacing.m
-        }}>
-          Edit Your Skills
-        </Text>
+      <View style={{ padding: 40, alignItems: 'center' }}>
+  <Text
+    style={{
+      fontSize: 22,
+      fontFamily: 'Nunito_700Bold',
+      marginBottom: spacing.m
+    }}
+  >
+    Edit Your Skills
+  </Text>
+
 
         <TextInput
           placeholder="Search skills..."
@@ -60,10 +62,10 @@ export default function EditSkillsScreen() {
             height: 44,
             backgroundColor: '#fff',
             borderRadius: 12,
-            paddingHorizontal: spacing.m,
+            paddingHorizontal: 100,
             borderColor: colors.muted,
             borderWidth: 1,
-            marginBottom: spacing.m,
+            marginBottom: 10,
           }}
         />
       </View>
@@ -89,7 +91,7 @@ export default function EditSkillsScreen() {
                 paddingVertical: 8,
                 paddingHorizontal: 16,
                 borderRadius: 24,
-                backgroundColor: isSelected ? colors.primary : '#81c9f0',
+                backgroundColor: isSelected ? '#81c9f0' : '#fff',
                 borderWidth: 1.5,
                 borderColor: isSelected ? colors.primary : '#81c9f0',
                 margin: 4,

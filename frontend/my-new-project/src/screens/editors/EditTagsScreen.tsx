@@ -42,13 +42,12 @@ export default function EditTagsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
-      <View style={{ padding: spacing.l }}>
+      <View style={{ padding: 40,alignItems: 'center' }}>
         <Text style={{
           fontSize: 22,
           fontFamily: 'Nunito_700Bold',
-          fontWeight: 'bold',
 
-          marginBottom: spacing.m
+          marginBottom: 10
         }}>
           Edit Your Tags
         </Text>
@@ -59,13 +58,13 @@ export default function EditTagsScreen() {
           onChangeText={setSearch}
           style={{
             height: 44,
-            fontFamily: 'Nunito_700Bold',
+            fontFamily: 'Nunito_400Regular',
             backgroundColor: '#fff',
             borderRadius: 12,
-            paddingHorizontal: spacing.m,
+            paddingHorizontal: 100,
             borderColor: colors.muted,
             borderWidth: 1,
-            marginBottom: spacing.m,
+            marginBottom: 10,
           }}
         />
       </View>
@@ -91,7 +90,7 @@ export default function EditTagsScreen() {
                 paddingVertical: 8,
                 paddingHorizontal: 16,
                 borderRadius: 24,
-                backgroundColor: isSelected ? colors.primary : '#81c9f0',
+                backgroundColor: isSelected ? '#81c9f0' : '#fff',
                 borderWidth: 1.5,
                 borderColor: isSelected ? colors.primary : '#81c9f0',
                 margin: 4,

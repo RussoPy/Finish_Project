@@ -45,11 +45,10 @@ export default function EditIndustryScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
-      <View style={{ padding: spacing.l }}>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={{ padding: 40,alignItems: 'center' }}>
         <Text style={{
           fontSize: 22,
-          fontWeight: 'bold',
           fontFamily: 'Nunito_700Bold',
           marginBottom: spacing.m
         }}>
@@ -57,17 +56,18 @@ export default function EditIndustryScreen() {
         </Text>
 
         <TextInput
-          placeholder="Search industries..."
+          placeholder="Search..."
           value={search}
           onChangeText={setSearch}
           style={{
             height: 44,
             backgroundColor: '#fff',
+            fontFamily:'Nunito_400Regular',
             borderRadius: 12,
-            paddingHorizontal: spacing.m,
+            paddingHorizontal: 100,
             borderColor: colors.muted,
             borderWidth: 1,
-            marginBottom: spacing.m,
+            marginBottom: 5,
           }}
         />
       </View>
@@ -93,7 +93,7 @@ export default function EditIndustryScreen() {
                 paddingVertical: 8,
                 paddingHorizontal: 16,
                 borderRadius: 24,
-                backgroundColor: isSelected ? colors.primary : '#81c9f0',
+                backgroundColor: isSelected ? '#81c9f0' : '#fff',
                 borderWidth: 1.5,
                 borderColor: isSelected ? colors.primary : '#81c9f0',
                 margin: 4,
