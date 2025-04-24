@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
     gap: 30,
     position: 'absolute',
     bottom: 30,
+    zIndex: 2,
   },
   actionBtn: {
     width: 60,

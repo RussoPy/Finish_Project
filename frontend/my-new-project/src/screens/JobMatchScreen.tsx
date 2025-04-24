@@ -36,6 +36,8 @@ export default function JobMatchScreen() {
             matches: Array.isArray(data.matches) ? data.matches : [],
             rejected: typeof data.rejected === 'object' && data.rejected !== null ? data.rejected : {},
             created_at: data.created_at ?? null,
+            imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [],
+            industry: data.industry ?? '', 
           };
         }).filter(job => job.is_active);
 
