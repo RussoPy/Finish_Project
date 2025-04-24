@@ -23,5 +23,6 @@ export interface Job {
     minimum_age?: number; // Optional field for minimum age requirement
     employee_distance?: number; // Optional field for distance from the business location
     availablity?: string; // Optional field for availability (e.g., "full-time", "part-time")
+    imageUrls?: string[];
   }
   

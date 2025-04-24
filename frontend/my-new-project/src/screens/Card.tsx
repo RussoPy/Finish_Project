@@ -173,10 +173,11 @@ export default function Card({ job, onSwipeLeft, onSwipeRight, onAfterSwipe, isT
 const styles = StyleSheet.create({
   cardContainer: {
     width: SCREEN_WIDTH * 0.9,
-    aspectRatio: 3 / 4,
+    aspectRatio: 3 / 5,
     position: 'absolute',
     alignSelf: 'center',
     justifyContent: 'center',
+    bottom:20
   },
   topCardContainer: {
      zIndex: 1,
