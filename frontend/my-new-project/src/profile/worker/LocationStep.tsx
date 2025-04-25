@@ -10,13 +10,13 @@ import { useNavigation } from '@react-navigation/native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import { Text } from 'react-native-paper';
-import { AppButton } from '../components/AppButton';
-import { auth, db } from '../api/firebase';
+import { AppButton } from '../../components/AppButton';
+import { auth, db } from '../../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import globalStyles from '../styles/globalStyles';
-import colors from '../styles/colors';
-import spacing from '../styles/spacing';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
+import globalStyles from '../../styles/globalStyles';
+import colors from '../../styles/colors';
+import spacing from '../../styles/spacing';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
 import { Button } from 'react-native-paper';
 
 export default function LocationStep() {

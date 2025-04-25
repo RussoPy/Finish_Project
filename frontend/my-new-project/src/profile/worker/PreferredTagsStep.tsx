@@ -10,11 +10,11 @@ import {
   Alert,
 } from 'react-native';
 import { styled } from 'nativewind';
-import { AppButton } from '../components/AppButton';
-import { auth, db } from '../api/firebase';
+import { AppButton } from '../../components/AppButton';
+import { auth, db } from '../../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
 
 const View = styled(RNView);
 const Text = styled(RNText);

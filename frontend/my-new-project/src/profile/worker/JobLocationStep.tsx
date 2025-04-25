@@ -5,16 +5,16 @@ import {
   Easing,
   Alert,
 } from 'react-native';
-import { auth, db } from '../api/firebase';
+import { auth, db } from '../../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
-import globalStyles from '../styles/globalStyles';
-import colors from '../styles/colors';
-import spacing from '../styles/spacing';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
+import globalStyles from '../../styles/globalStyles';
+import colors from '../../styles/colors';
+import spacing from '../../styles/spacing';
 import { Button } from 'react-native-paper';
-import Slider from '../components/Slider';
+import Slider from '../../components/Slider';
 
 export default function JobLocationStep() {
   const navigation = useNavigation<any>();

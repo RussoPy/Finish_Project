@@ -1,10 +1,10 @@
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
-import globalStyles from '../styles/globalStyles';
-import colors from '../styles/colors';
-import spacing from '../styles/spacing';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
+import globalStyles from '../../styles/globalStyles';
+import colors from '../../styles/colors';
+import spacing from '../../styles/spacing';
 import { Button } from 'react-native-paper';
 
 export default function JobPreferences() {
