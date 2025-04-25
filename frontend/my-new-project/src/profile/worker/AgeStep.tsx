@@ -3,11 +3,11 @@ import { View, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
 import { Text, TextInput, Button, IconButton, useTheme, HelperText } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import { auth, db } from '../api/firebase';
+import { auth, db } from '../../api/firebase';
 import { doc, updateDoc, Timestamp } from 'firebase/firestore';
-import globalStyles from '../styles/globalStyles';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
-import colors from '../styles/colors';
+import globalStyles from '../../styles/globalStyles';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
+import colors from '../../styles/colors';
 
 export default function BirthDateStep() {
   const navigation = useNavigation<any>();

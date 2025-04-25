@@ -1,35 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  TextInput,
-  ScrollView,
   Pressable,
   Animated,
   Easing,
   Alert,
+  ScrollView,
 } from 'react-native';
-import { auth, db } from '../api/firebase';
+import { auth, db } from '../../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
-import globalStyles from '../styles/globalStyles';
-import colors from '../styles/colors';
-import spacing from '../styles/spacing';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
+import globalStyles from '../../styles/globalStyles';
+import colors from '../../styles/colors';
+import spacing from '../../styles/spacing';
 import { Button, Text } from 'react-native-paper';
 
-const industries = [
-  "Retail", "Food Service", "Hospitality", "Construction", "Transportation",
-  "Delivery", "Warehouse", "Cleaning", "Security", "Customer Support",
-  "Software Development", "Frontend Development", "Backend Development",
-  "UI/UX Design", "Graphic Design", "Education", "Tutoring", "Marketing",
-  "Sales", "Accounting", "Finance", "Real Estate", "Legal", "Fitness", "Medical",
-  "Photography", "Barista", "Chef", "Waiter", "Event Planning", "Fashion",
-  "Hair & Beauty", "Freelance", "Remote Work", "Driving", "Startup", "Corporate"
-];
+const options = ['Full-time', 'Part-time', 'Remote'];
 
-export default function IndustryPreferencesStep() {
+export default function AvailabilityStep() {
   const navigation = useNavigation<any>();
   const [selected, setSelected] = useState<string[]>([]);
-  const [search, setSearch] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -49,33 +39,29 @@ export default function IndustryPreferencesStep() {
     ]).start();
   }, []);
 
-  const toggle = (industry: string) => {
+  const toggle = (option: string) => {
     setSelected((prev) =>
-      prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
+      prev.includes(option) ? prev.filter((i) => i !== option) : [...prev, option]
     );
   };
 
-  const handleSave = async () => {
+  const handleSubmit = async () => {
     const uid = auth.currentUser?.uid;
     if (!uid || selected.length === 0) {
-      Alert.alert('Please choose at least one industry');
+      Alert.alert('Please select at least one availability option');
       return;
     }
 
     try {
       await updateDoc(doc(db, 'users', uid), {
-        preferred_tags: selected,
+        availability: selected,
       });
 
-      navigation.navigate('Experience'); // next step
+      navigation.navigate('JobLocationStep');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
   };
-
-  const filtered = industries.filter((i) =>
-    i.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
     <Animated.View
@@ -87,21 +73,21 @@ export default function IndustryPreferencesStep() {
         },
       ]}
     >
-      {/* 🧭 Top Navigation */}
+      {/* ⬅️ Header with Progress */}
       <ProfileNavHeader
-        stepText="5/10"
-        progress={0.5}
-        onSkip={() => navigation.navigate('Experience')}
+        stepText="8/10"
+        progress={0.8}
+        onSkip={() => navigation.navigate('JobLocationStep')}
         showBack
         showSkip={false}
       />
 
       {/* 🏷️ Title */}
       <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
-        your <Text style={{ color: colors.secondary }}>industry?</Text>
+        your <Text style={{ color: colors.secondary }}>availability?</Text>
       </Text>
 
-      {/* 📄 Subtitle */}
+      {/* 💬 Subtitle */}
       <Text
         style={{
           color: colors.info,
@@ -111,67 +97,50 @@ export default function IndustryPreferencesStep() {
           paddingHorizontal: spacing.l,
         }}
       >
-        Select industries you’d like to work in. You can choose more than one.
+        Select your availability preferences.
       </Text>
 
-      {/* 🔍 Search */}
-      <TextInput
-        placeholder="Search industries..."
-        value={search}
-        onChangeText={setSearch}
-        style={{
-          height: 44,
-          backgroundColor: '#fff',
-          borderRadius: 12,
-          paddingHorizontal: spacing.m,
-          borderColor: colors.muted,
-          borderWidth: 1,
-          marginBottom: spacing.m,
-        }}
-      />
-
-      {/* 🧠 Pill Grid */}
+      {/* ✅ Option Buttons */}
       <ScrollView
         contentContainerStyle={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 8,
-          paddingBottom: 100,
+          paddingBottom: 120,
         }}
       >
-        {filtered.map((industry) => {
-          const isSelected = selected.includes(industry);
+        {options.map((opt) => {
+          const isSelected = selected.includes(opt);
           return (
             <Pressable
-              key={industry}
-              onPress={() => toggle(industry)}
+              key={opt}
+              onPress={() => toggle(opt)}
               style={{
-                paddingVertical: 8,
-                paddingHorizontal: 16,
-                borderRadius: 24,
+                borderRadius: 16,
+                paddingVertical: 14,
+                paddingHorizontal: 24,
+                marginBottom: spacing.m,
                 backgroundColor: isSelected ? colors.primary : '#fff',
                 borderWidth: 1,
                 borderColor: isSelected ? colors.primary : colors.muted,
+                alignItems: 'center',
               }}
             >
               <Text
                 style={{
                   color: isSelected ? '#fff' : colors.primary,
-                  fontSize: 14,
-                  fontWeight: '500',
+                  fontWeight: '600',
+                  fontSize: 16,
                 }}
               >
-                {industry}
+                {opt}
               </Text>
             </Pressable>
           );
         })}
       </ScrollView>
 
-      {/* ✅ Continue */}
+      {/* 🎯 Finish Button */}
       <Button
         mode="contained"
-        onPress={handleSave}
+        onPress={handleSubmit}
         disabled={selected.length === 0}
         style={[
           globalStyles.button,
@@ -179,7 +148,7 @@ export default function IndustryPreferencesStep() {
             position: 'absolute',
             bottom: 30,
             alignSelf: 'center',
-            backgroundColor: selected.length === 0 ? colors.muted : colors.primary,
+            backgroundColor: selected.length > 0 ? colors.primary : colors.muted,
           },
         ]}
         contentStyle={globalStyles.buttonContent}

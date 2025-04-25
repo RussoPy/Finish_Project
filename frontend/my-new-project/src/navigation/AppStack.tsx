@@ -1,4 +1,5 @@
 // src/navigation/AppStack.tsx
+
 import { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
@@ -11,7 +12,16 @@ import { auth, db } from '../api/firebase';
 import { ActivityIndicator, View as RNView } from 'react-native';
 import { styled } from 'nativewind';
 
-const Stack = createNativeStackNavigator();
+// ① Export ParamList for AppStack
+export type AppStackParamList = {
+  Home: undefined;
+  ProfileSetup: undefined;
+  EditSkills: undefined;
+  EditTags: undefined;
+  EditIndustry: undefined;
+};
+
+const Stack = createNativeStackNavigator<AppStackParamList>();
 const View = styled(RNView);
 
 export default function AppStack() {
@@ -20,14 +30,13 @@ export default function AppStack() {
   useEffect(() => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-  
+
     const unsub = onSnapshot(doc(db, 'users', uid), (snap) => {
       if (!snap.exists()) {
-        console.warn("User document does not exist yet. Going to ProfileSetup.");
-        setInitialRoute('ProfileSetup'); // 👈 VERY IMPORTANT!
+        setInitialRoute('ProfileSetup');
         return;
       }
-    
+
       const data = snap.data();
       if (data?.profileComplete) {
         setInitialRoute('Home');
@@ -35,9 +44,10 @@ export default function AppStack() {
         setInitialRoute('ProfileSetup');
       }
     });
-  
+
     return unsub;
   }, []);
+
   if (!initialRoute) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
@@ -47,7 +57,10 @@ export default function AppStack() {
   }
 
   return (
-    <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName={initialRoute as keyof AppStackParamList}
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="ProfileSetup" component={ProfileSetupNavigator} />
       <Stack.Screen name="EditSkills" component={EditSkillsScreen} />

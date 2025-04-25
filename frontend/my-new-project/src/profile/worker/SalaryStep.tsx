@@ -8,14 +8,14 @@ import {
   Easing,
   Pressable,
 } from 'react-native';
-import { AppButton } from '../components/AppButton';
-import { auth, db } from '../api/firebase';
+import { AppButton } from '../../components/AppButton';
+import { auth, db } from '../../api/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { ProfileNavHeader } from '../components/ProfileNavHeader';
-import globalStyles from '../styles/globalStyles';
-import colors from '../styles/colors';
-import spacing from '../styles/spacing';
+import { ProfileNavHeader } from '../../components/ProfileNavHeader';
+import globalStyles from '../../styles/globalStyles';
+import colors from '../../styles/colors';
+import spacing from '../../styles/spacing';
 import { Button } from 'react-native-paper';
 
 export default function SalaryStep() {
