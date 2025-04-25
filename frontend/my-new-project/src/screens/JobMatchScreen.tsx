@@ -9,7 +9,7 @@ import {likeJob, dislikeJob} from '../helpers/jobHelper'; // ✅ adjust this imp
 export default function JobMatchScreen() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId: string | undefined = auth.currentUser?.uid;
+  const workerId: string | undefined = auth.currentUser?.uid;
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -68,14 +68,14 @@ export default function JobMatchScreen() {
       <SwipeableCardStack
         jobs={jobs}
         onSwipeRight={(job: Job) => {
-        if (!userId) return;
+        if (!workerId) return;
         console.log('👉 Liked:', job.title);
-        likeJob(userId, job.id);
+        likeJob(workerId, job.id);
         }}
         onSwipeLeft={(job: Job) => {
-        if (!userId) return;
+        if (!workerId) return;
         console.log('👈 Disliked:', job.title);
-        dislikeJob(userId, job.id);
+        dislikeJob(workerId, job.id);
         }}
       />
       ) : (
