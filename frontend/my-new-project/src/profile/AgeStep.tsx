@@ -8,6 +8,7 @@ import { doc, updateDoc, Timestamp } from 'firebase/firestore';
 import globalStyles from '../styles/globalStyles';
 import { ProfileNavHeader } from '../components/ProfileNavHeader';
 import colors from '../styles/colors';
+import { Worker } from '../models/worker';
 
 export default function BirthDateStep() {
   const navigation = useNavigation<any>();
@@ -31,22 +32,43 @@ export default function BirthDateStep() {
   };
 
   const handleSubmit = async () => {
-    if (!birthDate) return;
-
+    if (!birthDate) {
+      console.log("Validation failed: Birth date is not set.");
+      setIsValidAge(false); // Ensure error state is shown
+      return;
+    }
     const age = calculateAge(birthDate);
-    if (age < 13) {
+    if (age < 13 || age > 120) { // Use consistent age check
+      console.log(`Validation failed: Age ${age} is not within range (13-120).`);
       setIsValidAge(false);
       return;
     }
+    setIsValidAge(true);
+
 
     const uid = auth.currentUser?.uid;
-    if (!uid) return;
+    if (!uid) {
+      console.error("Error: User is not authenticated.");
+      return;
+    }
 
-    await updateDoc(doc(db, 'users', uid), {
-      birth_date: Timestamp.fromDate(birthDate),
-    });
+    const dataToUpdate: Partial<Worker> = {
+      birth_date: Timestamp.fromDate(birthDate), 
+    };
 
-    navigation.navigate('Location');
+    const workerDocRef = doc(db, 'workers', uid);
+
+    try {
+      
+       await updateDoc(workerDocRef, dataToUpdate); // Keeps original updateDoc approach
+
+
+      console.log('Worker profile updated successfully with birth date.');
+      navigation.navigate('Location'); // Navigate to the next step on success
+    } catch (error) {
+      console.error('Error updating worker profile:', error);
+     
+    }
   };
 
   const parseInputDate = (input: string): Date | null => {
