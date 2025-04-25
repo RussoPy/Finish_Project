@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler'; // 👈 must be first
+import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import AppNavigator from './src/navigation/AppNavigator';
 import Toast from 'react-native-toast-message';

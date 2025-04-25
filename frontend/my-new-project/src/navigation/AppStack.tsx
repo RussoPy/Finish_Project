@@ -20,8 +20,14 @@ export default function AppStack() {
   useEffect(() => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-
+  
     const unsub = onSnapshot(doc(db, 'users', uid), (snap) => {
+      if (!snap.exists()) {
+        console.warn("User document does not exist yet. Going to ProfileSetup.");
+        setInitialRoute('ProfileSetup'); // 👈 VERY IMPORTANT!
+        return;
+      }
+    
       const data = snap.data();
       if (data?.profileComplete) {
         setInitialRoute('Home');
@@ -29,10 +35,9 @@ export default function AppStack() {
         setInitialRoute('ProfileSetup');
       }
     });
-
+  
     return unsub;
   }, []);
-
   if (!initialRoute) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
