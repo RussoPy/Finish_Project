@@ -3,6 +3,143 @@ import { StyleSheet } from 'react-native';
 import colors from './colors';
 import spacing from './spacing';
 
+export const cardStyles = StyleSheet.create({
+  card: {
+    position: 'absolute',
+    width: '85%',
+    height: 400,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: spacing.m,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  nextCard: {
+    transform: [{ scale: 0.95 }],
+    zIndex: 0,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 8,
+    color: colors.textPrimary,
+  },
+  experience: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
+  salary: {
+    marginTop: 4,
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.textPrimary,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.s,
+  },
+  tag: {
+    backgroundColor: colors.lightTeal,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  tagText: {
+    color: colors.tealDark,
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  label: {
+    position: 'absolute',
+    top: 20,
+    padding: 10,
+    borderWidth: 4,
+    borderRadius: 10,
+  },
+  likeLabel: {
+    left: 20,
+    borderColor: colors.green,
+  },
+  nopeLabel: {
+    right: 20,
+    borderColor: colors.red,
+  },
+  labelText: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: spacing.s,
+  },
+  logo: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: colors.lightGray,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    gap: 8,
+  },
+  infoLabel: {
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  infoValue: {
+    color: colors.textSecondary,
+  },
+  description: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 12,
+  },
+  footerText: {
+    marginTop: 12,
+    fontSize: 12,
+    color: colors.info,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  
+  logoSquare: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: '#eee',
+  },
+  
+  subtitle: {
+    fontSize: 14,
+    color: '#777',
+    marginTop: 4,
+  },
+  
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  
+  detailText: {
+    fontSize: 14,
+    color: '#444',
+  },
+});
+
 const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -94,7 +231,33 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  infoRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: 6,
+  gap: 8,
+},
+infoLabel: {
+  fontWeight: '600',
+  color: colors.textPrimary,
+},
+infoValue: {
+  color: colors.textSecondary,
+},
+description: {
+  fontSize: 14,
+  color: colors.textSecondary,
+  marginBottom: 12,
+},
+footerText: {
+  marginTop: 12,
+  fontSize: 12,
+  color: colors.info,
+}
   
 });
 
 export default globalStyles;
+
+
+

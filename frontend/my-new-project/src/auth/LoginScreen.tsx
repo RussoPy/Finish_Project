@@ -1,34 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
-import {
-  TextInput as RNTextInput,
-  View as RNView,
-  Text as RNText,
-  Animated,
-  Easing,
-  ActivityIndicator,
-  Pressable,
-  Switch,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { styled } from 'nativewind';
-import { AppButton } from '../components/AppButton';
-import { useAuth } from './useAuth';
-import Toast from 'react-native-toast-message';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TextInput, Pressable, Switch, ActivityIndicator, Animated, Easing, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-
+import Toast from 'react-native-toast-message';
+import { AppButton } from '../components/AppButton';
+import { auth } from '../api/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { ensureUserProfileExists } from '../helpers/ensureUserProfileExists';
 import colors from '../styles/colors';
-import globalStyles from '../styles/globalStyles';
-import { Image } from 'react-native';
-
-
-const View = styled(RNView);
-const Text = styled(RNText);
-const TextInput = styled(RNTextInput);
+import spacing from '../styles/spacing';
 
 export default function LoginScreen({ navigation }: any) {
-  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +18,7 @@ export default function LoginScreen({ navigation }: any) {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
+  const formSlide = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -57,138 +39,95 @@ export default function LoginScreen({ navigation }: any) {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      await login(email, password);
-      Toast.show({
-        type: 'success',
-        text1: 'Welcome back 👋',
-        text2: 'Logged in successfully',
-      });
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Ensure Firestore user profile exists
+      await ensureUserProfileExists();
+
+      Toast.show({ type: 'success', text1: 'Welcome back 👋' });
+      // Let AppStack handle redirection after login
     } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'Login failed ❌',
-        text2: error.message,
-      });
+      Toast.show({ type: 'error', text1: 'Login failed ❌', text2: error.message });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={globalStyles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <Animated.ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      }}
+      contentContainerStyle={{ padding: spacing.l }}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Animated.View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          }}
-        >
-          <View style={{ alignItems: 'center' }}>
-            <Image
-              source={require('../assets/icon.png')}
-              style={{
-                width: 110,
-                height: 110,
-                marginBottom: 28,
-                borderRadius: 24,
-              }}
-              resizeMode="contain"
+      <View style={{ marginBottom: spacing.l }}>
+        {/* Your logo area */}
+        <Text style={{ fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: colors.primary }}>
+          Welcome Back
+        </Text>
+        <Text style={{ fontSize: 14, color: colors.info, textAlign: 'center', marginTop: 8 }}>
+          Let's continue your journey 🚀
+        </Text>
+      </View>
+
+      <Animated.View style={{ transform: [{ translateX: formSlide }] }}>
+        <TextInput
+          placeholder="Email"
+          placeholderTextColor={colors.info}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor={colors.info}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          style={inputStyle}
+        />
+
+        <Pressable onPress={() => setShowPassword(!showPassword)} style={{ marginBottom: spacing.m }}>
+          <Feather name={showPassword ? 'eye' : 'eye-off'} size={20} color={colors.info} />
+        </Pressable>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.m }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Switch
+              value={rememberMe}
+              onValueChange={setRememberMe}
+              trackColor={{ false: '#cbd5e1', true: colors.secondary }}
+              thumbColor={rememberMe ? colors.primary : '#f1f5f9'}
             />
-            <Text
-              style={{
-                fontFamily: 'BubblegumSans_400Regular',
-                fontSize: 32,
-                textAlign: 'center',
-                color: colors.primary,
-              }}
-            >
-              Welcome Back
-            </Text>
-            <Text style={{ textAlign: 'center', color: colors.info, marginBottom: 24 }}>
-              Login to your Flowjob account
-            </Text>
+            <Text style={{ marginLeft: spacing.s, color: colors.info }}>Remember Me</Text>
           </View>
+          {loading && <ActivityIndicator size="small" color={colors.primary} />}
+        </View>
 
-          <TextInput
-            placeholder="Email"
-            placeholderTextColor={colors.info}
-            style={[globalStyles.input, {
-              backgroundColor: 'white',
-              padding: 14,
-              borderWidth: 1,
-              borderColor: colors.muted,
-            }]}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+        <AppButton title="Login" onPress={handleLogin} />
+      </Animated.View>
 
-          <View style={[
-            globalStyles.input,
-            {
-              backgroundColor: 'white',
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 14,
-              borderWidth: 1,
-              borderColor: colors.muted,
-            }
-          ]}>
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor={colors.info}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              style={{ flex: 1, paddingVertical: 14 }}
-            />
-            <Pressable onPress={() => setShowPassword(!showPassword)}>
-              <Feather
-                name={showPassword ? 'eye' : 'eye-off'}
-                size={20}
-                color={colors.info}
-              />
-            </Pressable>
-          </View>
-
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: 8,
-            marginBottom: 16,
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Switch
-                value={rememberMe}
-                onValueChange={setRememberMe}
-                trackColor={{ false: colors.muted, true: colors.secondary }}
-                thumbColor={rememberMe ? colors.primary : '#f1f5f9'}
-              />
-              <Text style={{ marginLeft: 8, color: colors.info }}>Remember Me</Text>
-            </View>
-            {loading && <ActivityIndicator size="small" color={colors.primary} />}
-          </View>
-
-          <AppButton title="Login" onPress={handleLogin} />
-
-          <Text style={{ marginTop: 40, textAlign: 'center', color: colors.primary }}>
-            Don’t have an account?{' '}
-            <Text
-              onPress={() => navigation.navigate('Register')}
-              style={globalStyles.highlightText}
-            >
-              Register
-            </Text>
-          </Text>
-        </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      <Text style={{ marginTop: spacing.l, textAlign: 'center', color: colors.info }}>
+        New here?{' '}
+        <Text onPress={() => navigation.navigate('Register')} style={{ color: colors.secondary, fontWeight: 'bold' }}>
+          Register
+        </Text>
+      </Text>
+    </Animated.ScrollView>
   );
 }
+
+const inputStyle = {
+  backgroundColor: 'white',
+  padding: spacing.m,
+  borderRadius: 12,
+  marginBottom: spacing.m,
+  borderColor: colors.muted,
+  borderWidth: 1,
+  fontSize: 16,
+};
