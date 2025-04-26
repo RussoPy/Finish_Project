@@ -54,31 +54,31 @@ export default function Card({ job, onSwipeLeft, onSwipeRight, onAfterSwipe, isT
     interpolate(translateX.value, [-SWIPE_THRESHOLD, -20], [1, 0], Extrapolate.CLAMP)
   );
   const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent, GestureContext>({
-      onStart: (_, ctx) => { ctx.startX = translateX.value; },
-      onActive: (event, ctx) => { translateX.value = ctx.startX + event.translationX; },
-      onEnd: (event) => {
-          if (Math.abs(event.velocityX) < 500 && Math.abs(translateX.value) < SWIPE_THRESHOLD) {
-              translateX.value = withTiming(0); return;
-          }
-          const velocityBasedThreshold = SWIPE_THRESHOLD * 0.5 + Math.abs(event.velocityX) * 0.1;
-          const finalThreshold = Math.max(SWIPE_THRESHOLD, velocityBasedThreshold);
-          const toX = (translateX.value > 0 ? 1 : -1) * SCREEN_WIDTH * 1.5;
+    onStart: (_, ctx) => { ctx.startX = translateX.value; },
+    onActive: (event, ctx) => { translateX.value = ctx.startX + event.translationX; },
+    onEnd: (event) => {
+      if (Math.abs(event.velocityX) < 500 && Math.abs(translateX.value) < SWIPE_THRESHOLD) {
+        translateX.value = withTiming(0); return;
+      }
+      const velocityBasedThreshold = SWIPE_THRESHOLD * 0.5 + Math.abs(event.velocityX) * 0.1;
+      const finalThreshold = Math.max(SWIPE_THRESHOLD, velocityBasedThreshold);
+      const toX = (translateX.value > 0 ? 1 : -1) * SCREEN_WIDTH * 1.5;
 
-          if (translateX.value > finalThreshold || (event.velocityX > 500 && translateX.value > 0)) {
-              translateX.value = withTiming(toX, { duration: 300 }, () => {
-                  runOnJS(onSwipeRight)(job); runOnJS(onAfterSwipe)();
-              });
-          } else if (translateX.value < -finalThreshold || (event.velocityX < -500 && translateX.value < 0)) {
-              translateX.value = withTiming(toX, { duration: 300 }, () => {
-                  runOnJS(onSwipeLeft)(job); runOnJS(onAfterSwipe)();
-              });
-          } else {
-              translateX.value = withTiming(0);
-          }
-      },
+      if (translateX.value > finalThreshold || (event.velocityX > 500 && translateX.value > 0)) {
+        translateX.value = withTiming(toX, { duration: 300 }, () => {
+          runOnJS(onSwipeRight)(job); runOnJS(onAfterSwipe)();
+        });
+      } else if (translateX.value < -finalThreshold || (event.velocityX < -500 && translateX.value < 0)) {
+        translateX.value = withTiming(toX, { duration: 300 }, () => {
+          runOnJS(onSwipeLeft)(job); runOnJS(onAfterSwipe)();
+        });
+      } else {
+        translateX.value = withTiming(0);
+      }
+    },
   });
   const animatedCardStyle = useAnimatedStyle(() => ({
-      transform: [ { translateX: translateX.value }, { rotateZ: `${rotateZ.value}deg` } ],
+    transform: [{ translateX: translateX.value }, { rotateZ: `${rotateZ.value}deg` }],
   }));
   const likeStyle = useAnimatedStyle(() => ({ opacity: likeOpacity.value }));
   const nopeStyle = useAnimatedStyle(() => ({ opacity: nopeOpacity.value }));
@@ -88,55 +88,60 @@ export default function Card({ job, onSwipeLeft, onSwipeRight, onAfterSwipe, isT
   // Common Card Content Renderer (Unchanged)
   const renderCardContent = (isPlaceholder = false) => (
     <PaperCard style={[styles.cardBase, isPlaceholder && styles.nextCardVisual]}>
-        <PaperCard.Title
-            title={job.title}
-            subtitle={`@ ${job.business_name || 'Unknown Company'}`}
-            titleStyle={styles.cardTitle}
-            subtitleStyle={[styles.cardSubtitle, { color: theme.colors.onSurfaceVariant }]}
-            left={(props) =>
-                job.logo_url ? (
-                    <Avatar.Image {...props} size={48} source={{ uri: job.logo_url }} style={styles.avatar} />
-                ) : (
-                    <Avatar.Icon {...props} size={48} icon="domain" style={styles.avatar} />
-                )
-            }
-        />
-        <PaperCard.Content>
-            {/* Details */}
-            <View style={styles.detailRow}>
-                <Ionicons name="cash-outline" size={18} color={theme.colors.primary} style={styles.icon} />
-                <PaperText variant="bodyMedium" style={styles.detailText} numberOfLines={1}>
-                    {job.salary_min && job.salary_max ? `$${job.salary_min} – $${job.salary_max}` : 'Salary not specified'}
-                </PaperText>
-            </View>
-            <View style={styles.detailRow}>
-                <Ionicons name="briefcase-outline" size={18} color={theme.colors.primary} style={styles.icon} />
-                <PaperText variant="bodyMedium" style={styles.detailText} numberOfLines={1}>
-                    {job.experience_required || 'Experience not specified'}
-                </PaperText>
-            </View>
-            <View style={styles.detailRow}>
-                <Ionicons name="location-outline" size={18} color={theme.colors.primary} style={styles.icon} />
-                <PaperText variant="bodyMedium" style={styles.detailText} numberOfLines={1}>
-                    {job.location_lat === 0 && job.location_lng === 0 ? 'Remote' : 'On-site / Hybrid'}
-                </PaperText>
-            </View>
-            {/* Skills */}
-            {job.skills_needed && job.skills_needed.length > 0 && (
-                <View style={styles.tagsContainer}>
-                    {job.skills_needed.slice(0, 5).map((skill: string) => (
-                        <PaperChip key={skill} style={styles.chip} textStyle={styles.chipText} mode="outlined">
-                            {skill}
-                        </PaperChip>
-                    ))}
-                    {job.skills_needed.length > 5 && ( <PaperChip style={styles.chip} textStyle={styles.chipText} mode="outlined">...</PaperChip> )}
-                </View>
-            )}
-            {/* Footer */}
-            <PaperText variant="bodySmall" style={[styles.footerText, { color: theme.colors.onSurfaceVariant }]}>
-                Posted {job.created_at ? formatDistanceToNow(job.created_at.toDate?.() || new Date(job.created_at), { addSuffix: true }) : 'recently'}
-            </PaperText>
-        </PaperCard.Content>
+      <PaperCard.Title
+        title={job.title}
+        subtitle={`@ ${job.business_name || 'Unknown Company'}`}
+        titleStyle={styles.cardTitle}
+        subtitleStyle={[styles.cardSubtitle, { color: theme.colors.onSurfaceVariant }]}
+        left={(props) =>
+          job.logo_url ? (
+            <Avatar.Image {...props} size={48} source={{ uri: job.logo_url }} style={styles.avatar} />
+          ) : (
+            <Avatar.Icon {...props} size={48} icon="domain" style={styles.avatar} />
+          )
+        }
+      />
+      <PaperCard.Content>
+        {/* Details */}
+        <View style={styles.detailRow}>
+          <Ionicons name="cash-outline" size={18} color={theme.colors.primary} style={styles.icon} />
+          <PaperText variant="bodyMedium" style={styles.detailText} numberOfLines={1}>
+            {job.salary_min && job.salary_max ? `$${job.salary_min} – $${job.salary_max}` : 'Salary not specified'}
+          </PaperText>
+        </View>
+        <View style={styles.detailRow}>
+          <Ionicons name="briefcase-outline" size={18} color={theme.colors.primary} style={styles.icon} />
+          <PaperText variant="bodyMedium" style={styles.detailText} numberOfLines={1}>
+            {job.experience_required || 'Experience not specified'}
+          </PaperText>
+        </View>
+        <View style={styles.detailRow}>
+          <Ionicons name="location-outline" size={18} color={theme.colors.primary} style={styles.icon} />
+          <PaperText variant="bodyMedium" style={styles.detailText} numberOfLines={1}>
+            {job.location_lat === 0 && job.location_lng === 0 ? 'Remote' : 'On-site / Hybrid'}
+          </PaperText>
+        </View>
+        {/* Skills */}
+        {job.skills_needed && job.skills_needed.length > 0 && (
+          <View style={styles.tagsContainer}>
+            {job.skills_needed.slice(0, 5).map((skill: string) => (
+              <PaperChip key={skill} style={styles.chip} textStyle={styles.chipText} mode="outlined">
+                {skill}
+              </PaperChip>
+            ))}
+            {job.skills_needed.length > 5 && (<PaperChip style={styles.chip} textStyle={styles.chipText} mode="outlined">...</PaperChip>)}
+          </View>
+        )}
+        {/* Footer */}
+        <PaperText variant="bodySmall" style={[styles.footerText, { color: theme.colors.onSurfaceVariant }]}>
+          Posted {job.created_at ? formatDistanceToNow(
+            job.created_at instanceof Date
+              ? job.created_at
+              : job.created_at.toDate(),
+            { addSuffix: true }
+          ) : 'recently'}
+        </PaperText>
+      </PaperCard.Content>
     </PaperCard>
   );
 
@@ -161,10 +166,10 @@ export default function Card({ job, onSwipeLeft, onSwipeRight, onAfterSwipe, isT
   } else {
     // Render the non-interactive card underneath
     return (
-        // Use the updated nextCardContainer style (no scale/translate)
-        <View style={[styles.cardContainer, styles.nextCardContainer]}>
-            {renderCardContent(true)}
-        </View>
+      // Use the updated nextCardContainer style (no scale/translate)
+      <View style={[styles.cardContainer, styles.nextCardContainer]}>
+        {renderCardContent(true)}
+      </View>
     );
   }
 }
@@ -177,10 +182,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignSelf: 'center',
     justifyContent: 'center',
-    bottom:20
+    bottom: 20
   },
   topCardContainer: {
-     zIndex: 1,
+    zIndex: 1,
   },
   // --- MODIFIED STYLE ---
   nextCardContainer: {
@@ -197,8 +202,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   nextCardVisual: {
-     opacity: 0.95, // Kept a very slight opacity difference for depth perception
-     elevation: 2,
+    opacity: 0.95, // Kept a very slight opacity difference for depth perception
+    elevation: 2,
   },
   // --- Content Styles (Unchanged) ---
   avatar: { backgroundColor: 'transparent', },
@@ -212,10 +217,10 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 12, },
   footerText: { marginTop: 'auto', paddingTop: 10, paddingBottom: 10, textAlign: 'center', fontSize: 12, },
   // --- Label Styles (Unchanged) ---
-   labelContainer: { position: 'absolute', top: 40, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 3, backgroundColor: 'rgba(0,0,0,0.1)', },
-   labelText: { fontSize: 28, fontWeight: 'bold', letterSpacing: 2, },
-   likeLabel: { left: 20, borderColor: '#4CAF50', transform: [{ rotate: '-15deg' }], },
-   likeLabelText: { color: '#4CAF50', },
-   nopeLabel: { right: 20, borderColor: '#F44336', transform: [{ rotate: '15deg' }], },
-   nopeLabelText: { color: '#F44336', },
+  labelContainer: { position: 'absolute', top: 40, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 3, backgroundColor: 'rgba(0,0,0,0.1)', },
+  labelText: { fontSize: 28, fontWeight: 'bold', letterSpacing: 2, },
+  likeLabel: { left: 20, borderColor: '#4CAF50', transform: [{ rotate: '-15deg' }], },
+  likeLabelText: { color: '#4CAF50', },
+  nopeLabel: { right: 20, borderColor: '#F44336', transform: [{ rotate: '15deg' }], },
+  nopeLabelText: { color: '#F44336', },
 });
