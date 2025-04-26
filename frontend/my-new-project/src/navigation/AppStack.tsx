@@ -1,71 +1,52 @@
 // src/navigation/AppStack.tsx
 
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileSetupNavigator from './ProfileSetupNavigator';
 import EditSkillsScreen from '../screens/editors/EditSkillsScreen';
 import EditTagsScreen from '../screens/editors/EditTagsScreen';
 import EditIndustryScreen from '../screens/editors/EditIndustryScreen';
-import { onSnapshot, doc } from 'firebase/firestore';
-import { auth, db } from '../api/firebase';
-import { ActivityIndicator, View as RNView } from 'react-native';
-import { styled } from 'nativewind';
+import EditBenefits from '../screens/editors/jobeditors/EditBenefits';
+import EditLocation from '../screens/editors/jobeditors/EditLocation';
+import AvailabilityEditor from '../screens/editors/AvailabilityEditor';
+import EditMinimumAge from '../screens/editors/jobeditors/EditMinimumAge';
+import SalaryEditor from '../screens/editors/SalaryEditor';
+import EditImages from '../screens/editors/jobeditors/EditImages';
+import EditDescription from '../screens/editors/jobeditors/EditDescription';
 
-// ① Export ParamList for AppStack
 export type AppStackParamList = {
   Home: undefined;
   ProfileSetup: undefined;
-  EditSkills: undefined;
-  EditTags: undefined;
-  EditIndustry: undefined;
+  EditSkills: { currentSkills: string[], onSave: (skills: string[]) => void };
+  EditTags: { currentTags: string[], onSave: (tags: string[]) => void };
+  EditIndustry: { currentIndustries: string[], onSave: (industries: string[]) => void };
+  EditBenefits: { currentBenefits: string[], onSave: (benefits: string[]) => void };
+  EditLocation: { currentAddress: string, onSave: (address: string) => void };
+  AvailabilityEditor: { currentAvailability: string, onSave: (availability: string) => void };
+  EditMinimumAge: { currentAge: string, onSave: (age: string) => void };
+  SalaryEditor: { salaryMin: string, salaryMax: string, onSave: (min: string, max: string) => void };
+  EditImages: { currentImages?: string[], onSave: (images: string[]) => void };
+  EditDescription: { currentDescription: string, onSave: (description: string) => void };
 };
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
-const View = styled(RNView);
 
 export default function AppStack() {
-  const [initialRoute, setInitialRoute] = useState<string | null>(null);
-
-  useEffect(() => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-
-    const unsub = onSnapshot(doc(db, 'users', uid), (snap) => {
-      if (!snap.exists()) {
-        setInitialRoute('ProfileSetup');
-        return;
-      }
-
-      const data = snap.data();
-      if (data?.profileComplete) {
-        setInitialRoute('Home');
-      } else {
-        setInitialRoute('ProfileSetup');
-      }
-    });
-
-    return unsub;
-  }, []);
-
-  if (!initialRoute) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#0ea5e9" />
-      </View>
-    );
-  }
-
   return (
-    <Stack.Navigator
-      initialRouteName={initialRoute as keyof AppStackParamList}
-      screenOptions={{ headerShown: false }}
-    >
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="ProfileSetup" component={ProfileSetupNavigator} />
       <Stack.Screen name="EditSkills" component={EditSkillsScreen} />
       <Stack.Screen name="EditTags" component={EditTagsScreen} />
       <Stack.Screen name="EditIndustry" component={EditIndustryScreen} />
+      <Stack.Screen name="EditBenefits" component={EditBenefits} />
+      <Stack.Screen name="EditLocation" component={EditLocation} />
+      <Stack.Screen name="AvailabilityEditor" component={AvailabilityEditor} />
+      <Stack.Screen name="EditMinimumAge" component={EditMinimumAge} />
+      <Stack.Screen name="SalaryEditor" component={SalaryEditor} />
+      <Stack.Screen name="EditImages" component={EditImages} />
+      <Stack.Screen name="EditDescription" component={EditDescription} />
     </Stack.Navigator>
   );
 }
