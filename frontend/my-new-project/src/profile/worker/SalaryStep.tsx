@@ -60,7 +60,7 @@ export default function SalaryStep() {
         salary_unit: unit,
       });
 
-      navigation.navigate('Availability');
+      navigation.navigate('WorkerAvailability');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
@@ -80,9 +80,9 @@ export default function SalaryStep() {
     >
       {/* 🔙 Header */}
       <ProfileNavHeader
-        stepText="7/10"
-        progress={0.7}
-        onSkip={() => navigation.navigate('Availability')}
+        stepText="9/12"
+        progress={9/12}
+        onSkip={() => navigation.navigate('WorkerAvailability')}
         showBack={true}
         showSkip={true}
       />

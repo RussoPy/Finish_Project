@@ -1,146 +1,227 @@
-import { useEffect, useRef, useState } from 'react';
+// src/profile/worker/TagPreferencesStep.tsx // Assuming path
+
+import React, { useState } from 'react'; // Use React import convention
 import {
-  View as RNView,
-  Text as RNText,
-  TextInput as RNTextInput,
-  ScrollView as RNScrollView,
-  Pressable as RNPressable,
-  Animated,
-  Easing,
-  Alert,
+    View,
+    ScrollView,
+    Pressable,
+    KeyboardAvoidingView,
+    Platform,
+    // StyleSheet removed
+    Alert
 } from 'react-native';
-import { styled } from 'nativewind';
-import { AppButton } from '../../components/AppButton';
-import { auth, db } from '../../api/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+// Use components from react-native-paper
+import { Button, Text, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// Assuming a WorkerProfileSetupParamList or similar exists
+// import type { WorkerProfileSetupParamList } from '../../navigation/WorkerProfileSetupNavigator';
+
+// Import Firestore functions and auth/db
+import { doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { auth, db } from '../../api/firebase';
+
 import { ProfileNavHeader } from '../../components/ProfileNavHeader';
+import globalStyles from '../../styles/globalStyles';
+import colors from '../../styles/colors';
+import spacing from '../../styles/spacing';
+// Removed nativewind imports and AppButton
 
-const View = styled(RNView);
-const Text = styled(RNText);
-const TextInput = styled(RNTextInput);
-const ScrollView = styled(RNScrollView);
-const Pressable = styled(RNPressable);
+// --- Navigation Prop Type ---
+// Replace 'any' with your actual ParamList and Route Name if available
+type TagPreferencesNavProp = NativeStackNavigationProp<any, 'TagPreferences'>;
 
+// --- Tag Options (Keep or fetch dynamically) ---
 const tagOptions = [
-  "Retail", "Food Service", "Hospitality", "Construction", "Transportation", "Delivery",
-  "Warehouse", "Cleaning", "Security", "Call Center", "Customer Support", "Tech Support",
-  "Software Development", "Frontend Development", "Backend Development", "UI/UX Design",
-  "Graphic Design", "Content Writing", "Translation", "Education", "Tutoring", "Marketing",
-  "Sales", "Social Media", "Accounting", "Finance", "Real Estate", "Legal", "Medical Assistant",
-  "Nursing", "Caregiving", "Fitness Trainer", "Hairdresser", "Makeup Artist", "Event Planning",
-  "Photography", "Video Editing", "Project Management", "Operations", "Human Resources",
-  "Recruitment", "Data Entry", "Driving", "Motorbike Delivery", "Truck Driver", "Barista",
-  "Waiter", "Bartender", "Chef", "Kitchen Assistant", "Dishwasher", "Mover", "Installer",
-  "Electrician", "Plumber", "Mechanic", "Technician", "Fashion", "Modeling", "Telemarketing",
-  "Admin Assistant", "Reception", "Hosting", "Babysitting", "Pet Sitting", "Gardening",
-  "Painting", "Carpentry", "Cleaning Services", "Laundry", "Warehouse Operator", "Stocking",
-  "QA Tester", "Automation", "Data Analyst", "Product Manager", "Scrum Master", "Jira Expert",
-  "Notion Specialist", "SEO Expert", "Google Ads", "Facebook Ads", "CRM", "SAP", "ERP",
-  "Copywriting", "Script Writing", "Voiceover", "Remote Work", "Freelance Gigs", "Part-Time",
-  "Full-Time", "Internship", "Volunteer Work", "Short-Term", "Startup", "Corporate", "Night Shifts",
-  "Day Shifts", "Flexible", "Work from Home", "Hybrid", "On-Site"
-];
+    "Retail", "Food Service", "Hospitality", "Construction", "Transportation", "Delivery",
+    "Warehouse", "Cleaning", "Security", "Call Center", "Customer Support", "Tech Support",
+    "Software Development", "Frontend Development", "Backend Development", "UI/UX Design",
+    "Graphic Design", "Content Writing", "Translation", "Education", "Tutoring", "Marketing",
+    "Sales", "Social Media", "Accounting", "Finance", "Real Estate", "Legal", "Medical Assistant",
+    "Nursing", "Caregiving", "Fitness Trainer", "Hairdresser", "Makeup Artist", "Event Planning",
+    "Photography", "Video Editing", "Project Management", "Operations", "Human Resources",
+    "Recruitment", "Data Entry", "Driving", "Motorbike Delivery", "Truck Driver", "Barista",
+    "Waiter", "Bartender", "Chef", "Kitchen Assistant", "Dishwasher", "Mover", "Installer",
+    "Electrician", "Plumber", "Mechanic", "Technician", "Fashion", "Modeling", "Telemarketing",
+    "Admin Assistant", "Reception", "Hosting", "Babysitting", "Pet Sitting", "Gardening",
+    "Painting", "Carpentry", "Cleaning Services", "Laundry", "Warehouse Operator", "Stocking",
+    "QA Tester", "Automation", "Data Analyst", "Product Manager", "Scrum Master", "Jira Expert",
+    "Notion Specialist", "SEO Expert", "Google Ads", "Facebook Ads", "CRM", "SAP", "ERP",
+    "Copywriting", "Script Writing", "Voiceover", "Remote Work", "Freelance Gigs", "Part-Time",
+    "Full-Time", "Internship", "Volunteer Work", "Short-Term", "Startup", "Corporate", "Night Shifts",
+    "Day Shifts", "Flexible", "Work from Home", "Hybrid", "On-Site"
+]; // Consider fetching this list
 
-export default function TagPrefrencesStep() {
-  const navigation = useNavigation<any>();
-  const [selectedPrefs, setSelectedPrefs] = useState<string[]>([]);
-  const [search, setSearch] = useState('');
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 400,
-        easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+export default function TagPreferencesStep() {
+    const navigation = useNavigation<TagPreferencesNavProp>();
+    const [selectedPrefs, setSelectedPrefs] = useState<string[]>([]);
+    const [search, setSearch] = useState('');
+    const [isSaving, setIsSaving] = useState(false); // Loading state
 
-  const togglePref = (pref: string) => {
-    setSelectedPrefs((prev) =>
-      prev.includes(pref) ? prev.filter((p) => p !== pref) : [...prev, pref]
+    // Remove animation refs and useEffect
+
+    const togglePref = (pref: string) => {
+        setSelectedPrefs((prev) =>
+            prev.includes(pref) ? prev.filter((p) => p !== pref) : [...prev, pref]
+        );
+    };
+
+    // --- handleSave function with loading state and error handling ---
+    const handleSave = async () => {
+        const uid = auth.currentUser?.uid;
+        // Validate: require at least one preference?
+        if (selectedPrefs.length === 0) {
+            Alert.alert('Selection Required', 'Please select at least one tag preference.');
+            return;
+        }
+        if (!uid) {
+            Alert.alert('Error', 'You must be logged in to save preferences.');
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            // Saving selected preferences to 'preferences' field in user doc
+            await updateDoc(doc(db, 'users', uid), {
+                preferences: selectedPrefs, // Use the field name from original logic
+                last_updated_at: Timestamp.now() // Add timestamp
+            });
+
+            console.log(`User document ${uid} updated successfully with tag preferences.`);
+            // Navigate to the next step in the WORKER flow
+            navigation.navigate('WorkerJobPreferences'); // Navigate as per original logic
+
+        } catch (err: any) {
+            console.error("Error updating preferences:", err);
+            Alert.alert('Save Error', err.message || 'Could not save preferences.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    // --- End of handleSave function ---
+
+
+    const filtered = tagOptions.filter((j) =>
+        j.toLowerCase().includes(search.toLowerCase())
     );
-  };
 
-  const handleSave = async () => {
-    const uid = auth.currentUser?.uid;
-    if (!uid || selectedPrefs.length === 0) {
-      Alert.alert('Please select at least one tag preference');
-      return;
-    }
+    return (
+        <KeyboardAvoidingView
+            style={[globalStyles.container, { justifyContent: 'flex-start' }]} // KAV setup
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+        >
+            {/* Adjust ProfileNavHeader props */}
+            <ProfileNavHeader
+                 stepText="5/12" // *** Adjust Worker Step Number ***
+                 progress={5/12} // *** Adjust Worker Progress ***
+                 showBack={true} // Assuming previous step exists
+                 showSkip={true} // Allow skipping preferences?
+                 // Update skip target if needed for worker flow
+                 onSkip={() => navigation.navigate('WorkerJobPreferences')}
+            />
 
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        preferences: selectedPrefs,
-      });
-      navigation.navigate('Location');
-    } catch (err: any) {
-      Alert.alert('Error', err.message);
-    }
-  };
+            {/* Content Wrapper for Vertical Centering */}
+            <View style={{
+                flex: 1,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                {/* Title */}
+                <Text style={[
+                    globalStyles.title,
+                    { marginBottom: spacing.m } // Reduced margin
+                ]}>
+                    Choose Tag Preferences
+                </Text>
+                <Text style={{ // Optional Subtitle
+                    color: colors.textSecondary,
+                    marginBottom: spacing.m,
+                    textAlign: 'center'
+                 }}>
+                    Select tags related to jobs you're interested in.
+                </Text>
 
-  const filtered = tagOptions.filter((j) =>
-    j.toLowerCase().includes(search.toLowerCase())
-  );
 
-  return (
-    <Animated.View
-      style={{
-        flex: 1,
-        backgroundColor: '#f0f9ff',
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-        padding: 20,
-      }}
-    >
+                {/* Search Input */}
+                <TextInput
+                    label="Search Tags" // Use label
+                    placeholder="Search tag types..."
+                    value={search}
+                    onChangeText={setSearch}
+                    mode="outlined" // Consistent style
+                    style={{ width: '100%', marginBottom: spacing.m }} // Full width, margin below
+                    disabled={isSaving}
+                    left={<TextInput.Icon icon="magnify" />} // Add search icon
+                />
 
-<ProfileNavHeader onSkip={() => navigation.navigate('IndustryPrefrencesStep')} />
-      <Text className="text-2xl font-bold text-blue-700 mb-4 text-center">
-        Choose tag Preferences
-      </Text>
+                {/* ScrollView for Tags */}
+                <ScrollView
+                    style={{ // Style ScrollView itself
+                        width: '100%',
+                        maxHeight: 300, // Limit height
+                        marginBottom: spacing.l,
+                    }}
+                    contentContainerStyle={{ // Style the content *inside* ScrollView
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        alignItems: 'flex-start',
+                        justifyContent: 'center',
+                        paddingVertical: spacing.s,
+                    }}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    {filtered.map((pref) => { // Use filtered list
+                        const isSelected = selectedPrefs.includes(pref);
+                        return (
+                            <Pressable
+                                key={pref}
+                                disabled={isSaving}
+                                onPress={() => togglePref(pref)}
+                                style={{ // Style each tag Pressable
+                                    paddingHorizontal: spacing.m,
+                                    paddingVertical: spacing.s,
+                                    margin: spacing.xs,
+                                    borderRadius: 20, // Pill-shaped
+                                    borderWidth: 1,
+                                    backgroundColor: isSelected ? colors.primary : colors.white,
+                                    borderColor: isSelected ? colors.primary : colors.muted,
+                                }}
+                            >
+                                <Text style={{ // Style tag text
+                                    color: isSelected ? colors.white : colors.primary,
+                                    fontWeight: isSelected ? '600' : 'normal',
+                                    fontSize: 14,
+                                }}>
+                                    {pref}
+                                </Text>
+                            </Pressable>
+                        );
+                    })}
+                </ScrollView>
 
-      <TextInput
-        placeholder="Search tag types..."
-        value={search}
-        onChangeText={setSearch}
-        className="bg-white p-3 rounded-xl border border-blue-200 mb-4"
-      />
-
-      <ScrollView className="flex-1 mb-4">
-        {filtered.map((pref) => (
-          <Pressable
-            key={pref}
-            onPress={() => togglePref(pref)}
-            className={`p-2 px-4 rounded-full my-1 mr-2 border ${
-              selectedPrefs.includes(pref)
-                ? 'bg-blue-500 border-blue-700'
-                : 'bg-white border-blue-300'
-            }`}
-          >
-            <Text
-              className={`text-sm ${
-                selectedPrefs.includes(pref) ? 'text-white' : 'text-blue-800'
-              }`}
-            >
-              {pref}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-
-      <AppButton
-        title="Save & Continue"
-        onPress={handleSave}
-      />
-    </Animated.View>
-  );
+                {/* Replace AppButton with Paper Button */}
+                <Button
+                    mode="contained"
+                    // Disable if no preferences selected or if saving
+                    disabled={selectedPrefs.length === 0 || isSaving}
+                    onPress={handleSave} // Use updated handleSave
+                    loading={isSaving}
+                    style={{ // Apply button styling
+                        width: '100%',
+                        borderRadius: 30,
+                        backgroundColor: selectedPrefs.length > 0 ? colors.primary : colors.muted,
+                        marginTop: spacing.m,
+                    }}
+                    contentStyle={globalStyles.buttonContent} // Global padding
+                    labelStyle={{ color: colors.white, fontWeight: '600' }} // Global text style
+                >
+                    {isSaving ? 'Saving...' : 'Save & Continue'}
+                </Button>
+            </View>
+        </KeyboardAvoidingView>
+    );
 }

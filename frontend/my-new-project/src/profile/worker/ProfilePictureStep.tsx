@@ -51,7 +51,7 @@ export default function ProfilePictureStep() {
         profileImage: url,
       });
 
-      navigation.navigate('SkillSelection');
+      navigation.navigate('WorkerSkills');
     } catch (err: any) {
       Alert.alert('Upload failed', err.message);
     } finally {
@@ -63,9 +63,9 @@ export default function ProfilePictureStep() {
     <View style={[globalStyles.container, { justifyContent: 'center' , alignItems: 'center' }]}>
       {/* 🔙 Header with Progress */}
       <ProfileNavHeader
-        stepText="3/10"
-        progress={0.3}
-        onSkip={() => navigation.navigate('SkillSelection')}
+        stepText="3/12"
+        progress={3/12}
+        onSkip={() => navigation.navigate('WorkerSkills')}
         showSkip={true}
         showBack={true}
       />

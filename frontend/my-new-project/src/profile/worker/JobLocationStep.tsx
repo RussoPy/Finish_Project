@@ -72,8 +72,8 @@ export default function JobLocationStep() {
     >
       {/* 🧭 Header */}
       <ProfileNavHeader
-        stepText="9/10"
-        progress={0.9}
+        stepText="11/12"
+        progress={11 / 12}
         onSkip={() => navigation.replace('Home')}
         showBack
         showSkip={false}

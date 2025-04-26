@@ -1,192 +1,224 @@
-import { useEffect, useRef, useState } from 'react';
+// src/profile/worker/IndustryPreferencesStep.tsx // Assuming path
+
+import React, { useState } from 'react'; // Use React import convention
 import {
-  TextInput,
-  ScrollView,
-  Pressable,
-  Animated,
-  Easing,
-  Alert,
+    View,
+    ScrollView,
+    Pressable,
+    KeyboardAvoidingView,
+    Platform,
+    // StyleSheet removed
+    Alert
 } from 'react-native';
-import { auth, db } from '../../api/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+// Use components from react-native-paper
+import { Button, Text, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// Assuming a WorkerProfileSetupParamList or similar exists
+// import type { WorkerProfileSetupParamList } from '../../navigation/WorkerProfileSetupNavigator';
+
+// Import Firestore functions and auth/db
+import { doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { auth, db } from '../../api/firebase';
+
 import { ProfileNavHeader } from '../../components/ProfileNavHeader';
 import globalStyles from '../../styles/globalStyles';
 import colors from '../../styles/colors';
 import spacing from '../../styles/spacing';
-import { Button, Text } from 'react-native-paper';
+// Removed Animated, Easing imports
 
+// --- Navigation Prop Type ---
+// Replace 'any' with your actual ParamList and Route Name if available
+type IndustryPrefsNavProp = NativeStackNavigationProp<any, 'IndustryPreferences'>; // Or correct route name
+
+// --- Industry Options (Keep or fetch dynamically) ---
 const industries = [
-  "Retail", "Food Service", "Hospitality", "Construction", "Transportation",
-  "Delivery", "Warehouse", "Cleaning", "Security", "Customer Support",
-  "Software Development", "Frontend Development", "Backend Development",
-  "UI/UX Design", "Graphic Design", "Education", "Tutoring", "Marketing",
-  "Sales", "Accounting", "Finance", "Real Estate", "Legal", "Fitness", "Medical",
-  "Photography", "Barista", "Chef", "Waiter", "Event Planning", "Fashion",
-  "Hair & Beauty", "Freelance", "Remote Work", "Driving", "Startup", "Corporate"
-];
+    "Retail", "Food Service", "Hospitality", "Construction", "Transportation",
+    "Delivery", "Warehouse", "Cleaning", "Security", "Customer Support",
+    "Software Development", "Frontend Development", "Backend Development",
+    "UI/UX Design", "Graphic Design", "Education", "Tutoring", "Marketing",
+    "Sales", "Accounting", "Finance", "Real Estate", "Legal", "Fitness", "Medical",
+    "Photography", "Barista", "Chef", "Waiter", "Event Planning", "Fashion",
+    "Hair & Beauty", "Freelance", "Remote Work", "Driving", "Startup", "Corporate"
+]; // Consider fetching this list
+
 
 export default function IndustryPreferencesStep() {
-  const navigation = useNavigation<any>();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [search, setSearch] = useState('');
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
+    const navigation = useNavigation<IndustryPrefsNavProp>();
+    const [selected, setSelected] = useState<string[]>([]);
+    const [search, setSearch] = useState('');
+    const [isSaving, setIsSaving] = useState(false); // Loading state
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 400,
-        easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+    // Remove animation refs and useEffect
 
-  const toggle = (industry: string) => {
-    setSelected((prev) =>
-      prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
+    const toggle = (industry: string) => {
+        setSelected((prev) =>
+            prev.includes(industry) ? prev.filter((i) => i !== industry) : [...prev, industry]
+        );
+    };
+
+    // --- handleSave function with loading state and error handling ---
+    const handleSave = async () => {
+        const uid = auth.currentUser?.uid;
+        // Validate: require at least one industry
+        if (selected.length === 0) {
+            Alert.alert('Selection Required', 'Please choose at least one industry.');
+            return;
+        }
+        if (!uid) {
+            Alert.alert('Error', 'You must be logged in to save preferences.');
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            // Saving selected industries to 'preferred_tags' field in user doc
+            // Note: Field name 'preferred_tags' comes from original code, verify if still correct
+            await updateDoc(doc(db, 'users', uid), {
+                preferred_tags: selected,
+                last_updated_at: Timestamp.now() // Add timestamp
+            });
+
+            console.log(`User document ${uid} updated successfully with industry preferences (preferred_tags).`);
+            // Navigate to the next step in the WORKER flow
+            navigation.navigate('WorkerExperience'); // Navigate as per original logic
+
+        } catch (err: any) {
+            console.error("Error updating industry preferences:", err);
+            Alert.alert('Save Error', err.message || 'Could not save preferences.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    // --- End of handleSave function ---
+
+    const filtered = industries.filter((i) =>
+        i.toLowerCase().includes(search.toLowerCase())
     );
-  };
 
-  const handleSave = async () => {
-    const uid = auth.currentUser?.uid;
-    if (!uid || selected.length === 0) {
-      Alert.alert('Please choose at least one industry');
-      return;
-    }
+    return (
+        <KeyboardAvoidingView
+            style={[globalStyles.container, { justifyContent: 'flex-start' }]} // KAV setup
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+        >
+             {/* Adjust ProfileNavHeader props for Worker flow */}
+            <ProfileNavHeader
+                 stepText="7/12" // *** Adjust Worker Step Number ***
+                 progress={7/12} // *** Adjust Worker Progress ***
+                 showBack={true}
+                 showSkip={false} // Require industry selection
+                 // onSkip={() => navigation.navigate('Experience')} // Optional skip logic
+            />
 
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        preferred_tags: selected,
-      });
+            {/* Content Wrapper for Vertical Centering */}
+            <View style={{
+                flex: 1,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                {/* Title - Match example styling */}
+                 <Text style={[
+                    globalStyles.title,
+                    // Match example's effective top margin
+                    { marginTop: spacing.l, marginBottom: spacing.xs }
+                ]}>
+                     Your <Text style={{ color: colors.secondary }}>industry?</Text>
+                 </Text>
 
-      navigation.navigate('Experience'); // next step
-    } catch (err: any) {
-      Alert.alert('Error', err.message);
-    }
-  };
+                 {/* Subtitle - Match example styling */}
+                 <Text
+                    style={{
+                        color: colors.info, // Use info color from theme
+                        textAlign: 'center',
+                        fontSize: 14,
+                        marginBottom: spacing.l, // Use large spacing
+                        paddingHorizontal: spacing.l, // Use large padding
+                    }}
+                 >
+                    Select industries you’d like to work in. You can choose more than one.
+                 </Text>
 
-  const filtered = industries.filter((i) =>
-    i.toLowerCase().includes(search.toLowerCase())
-  );
+                {/* Search Input */}
+                <TextInput
+                    label="Search Industries" // Use label
+                    placeholder="Search industries..."
+                    value={search}
+                    onChangeText={setSearch}
+                    mode="outlined" // Consistent style
+                    style={{ width: '100%', marginBottom: spacing.m }} // Full width, margin below
+                    disabled={isSaving}
+                    left={<TextInput.Icon icon="magnify" />} // Add search icon
+                />
 
-  return (
-    <Animated.View
-      style={[
-        globalStyles.container,
-        {
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }],
-        },
-      ]}
-    >
-      {/* 🧭 Top Navigation */}
-      <ProfileNavHeader
-        stepText="5/10"
-        progress={0.5}
-        onSkip={() => navigation.navigate('Experience')}
-        showBack
-        showSkip={false}
-      />
+                {/* ScrollView for Industries */}
+                <ScrollView
+                    style={{ // Style ScrollView itself
+                        width: '100%',
+                        maxHeight: 300, // Limit height
+                        marginBottom: spacing.l,
+                    }}
+                    contentContainerStyle={{ // Style the content *inside* ScrollView
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        alignItems: 'flex-start',
+                        justifyContent: 'center',
+                        paddingVertical: spacing.s,
+                        // Use gap from example if preferred over margin on items
+                        // gap: 8,
+                    }}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    {filtered.map((industry) => { // Use filtered list
+                        const isSelected = selected.includes(industry);
+                        return (
+                            <Pressable
+                                key={industry}
+                                disabled={isSaving}
+                                onPress={() => toggle(industry)}
+                                style={{ // Style each industry Pressable - match example closely
+                                    paddingVertical: spacing.s, // 8
+                                    paddingHorizontal: spacing.m, // 16
+                                    margin: spacing.xs, // ~4, use instead of gap
+                                    borderRadius: 24, // Pill-shaped from example
+                                    borderWidth: 1,
+                                    backgroundColor: isSelected ? colors.primary : colors.white,
+                                    borderColor: isSelected ? colors.primary : colors.muted,
+                                }}
+                            >
+                                <Text style={{ // Style industry text - match example
+                                    color: isSelected ? colors.white : colors.primary,
+                                    fontSize: 14,
+                                    fontWeight: '500', // Match example
+                                }}>
+                                    {industry}
+                                </Text>
+                            </Pressable>
+                        );
+                    })}
+                </ScrollView>
 
-      {/* 🏷️ Title */}
-      <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
-        your <Text style={{ color: colors.secondary }}>industry?</Text>
-      </Text>
-
-      {/* 📄 Subtitle */}
-      <Text
-        style={{
-          color: colors.info,
-          textAlign: 'center',
-          fontSize: 14,
-          marginBottom: spacing.l,
-          paddingHorizontal: spacing.l,
-        }}
-      >
-        Select industries you’d like to work in. You can choose more than one.
-      </Text>
-
-      {/* 🔍 Search */}
-      <TextInput
-        placeholder="Search industries..."
-        value={search}
-        onChangeText={setSearch}
-        style={{
-          height: 44,
-          backgroundColor: '#fff',
-          borderRadius: 12,
-          paddingHorizontal: spacing.m,
-          borderColor: colors.muted,
-          borderWidth: 1,
-          marginBottom: spacing.m,
-        }}
-      />
-
-      {/* 🧠 Pill Grid */}
-      <ScrollView
-        contentContainerStyle={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 8,
-          paddingBottom: 100,
-        }}
-      >
-        {filtered.map((industry) => {
-          const isSelected = selected.includes(industry);
-          return (
-            <Pressable
-              key={industry}
-              onPress={() => toggle(industry)}
-              style={{
-                paddingVertical: 8,
-                paddingHorizontal: 16,
-                borderRadius: 24,
-                backgroundColor: isSelected ? colors.primary : '#fff',
-                borderWidth: 1,
-                borderColor: isSelected ? colors.primary : colors.muted,
-              }}
-            >
-              <Text
-                style={{
-                  color: isSelected ? '#fff' : colors.primary,
-                  fontSize: 14,
-                  fontWeight: '500',
-                }}
-              >
-                {industry}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      {/* ✅ Continue */}
-      <Button
-        mode="contained"
-        onPress={handleSave}
-        disabled={selected.length === 0}
-        style={[
-          globalStyles.button,
-          {
-            position: 'absolute',
-            bottom: 30,
-            alignSelf: 'center',
-            backgroundColor: selected.length === 0 ? colors.muted : colors.primary,
-          },
-        ]}
-        contentStyle={globalStyles.buttonContent}
-        labelStyle={{ color: 'white', fontWeight: '600' }}
-      >
-        Next
-      </Button>
-    </Animated.View>
-  );
+                {/* Use Paper Button */}
+                <Button
+                    mode="contained"
+                    // Disable if no industries selected or if saving
+                    disabled={selected.length === 0 || isSaving}
+                    onPress={handleSave} // Use updated handleSave
+                    loading={isSaving}
+                    style={{ // Apply button styling
+                        width: '100%',
+                        borderRadius: 30,
+                        backgroundColor: selected.length > 0 ? colors.primary : colors.muted,
+                        marginTop: spacing.m,
+                    }}
+                    contentStyle={globalStyles.buttonContent} // Global padding
+                    labelStyle={{ color: colors.white, fontWeight: '600' }} // Global text style
+                >
+                    {isSaving ? 'Saving...' : 'Next'}
+                </Button>
+            </View>
+        </KeyboardAvoidingView>
+    );
 }

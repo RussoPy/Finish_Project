@@ -92,7 +92,7 @@ export default function LocationStep() {
         location_lng: region.longitude,
       });
 
-      navigation.navigate('ProfilePicture');
+      navigation.navigate('WorkerProfilePicture');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
@@ -110,9 +110,9 @@ export default function LocationStep() {
     >
       {/* ⬅️ Header with Progress */}
       <ProfileNavHeader
-        stepText="2/10"
-        progress={0.2}
-        onSkip={() => navigation.navigate('ProfilePicture')}
+        stepText="2/12"
+        progress={2/12}
+        onSkip={() => navigation.navigate('WorkerProfilePicture')}
         showSkip={false}
         showBack={true}
       />

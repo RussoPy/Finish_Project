@@ -14,11 +14,10 @@ export default function JobPreferences() {
     <View style={[globalStyles.container]}>
       {/* 🔙 Header */}
       <ProfileNavHeader
-        stepText="5/10"
-        progress={0.5}
+        stepText="6/12"
+        progress={6/12}
         showBack={true}
         showSkip={false}
-        onSkip={() => navigation.navigate('IndustryPrefrencesStep')}
       />
 
       {/* 📦 Centered block */}
@@ -52,7 +51,7 @@ export default function JobPreferences() {
       {/* ✅ Continue Button */}
       <Button
         mode="contained"
-        onPress={() => navigation.navigate('IndustryPrefrencesStep')}
+        onPress={() => navigation.navigate('WorkerIndustry')}
         style={[
           globalStyles.button,
           {

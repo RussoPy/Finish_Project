@@ -46,7 +46,7 @@ export default function BirthDateStep() {
       birth_date: Timestamp.fromDate(birthDate),
     });
 
-    navigation.navigate('Location');
+    navigation.navigate('WorkerLocation');
   };
 
   const parseInputDate = (input: string): Date | null => {
@@ -110,11 +110,11 @@ export default function BirthDateStep() {
     <KeyboardAvoidingView style={globalStyles.container} behavior="padding">
       {/* Header */}
       <ProfileNavHeader
-        stepText="1/10"
-        progress={0.1}
+        stepText="1/12"
+        progress={0.12}
         showBack={false}
         showSkip={true}
-        onSkip={() => navigation.navigate('JobLocationStep')}
+        onSkip={() => navigation.navigate('WorkerLocation')}
       />
 
       {/* Title */}
