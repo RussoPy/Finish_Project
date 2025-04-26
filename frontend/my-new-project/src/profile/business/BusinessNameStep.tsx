@@ -37,7 +37,7 @@ export default function BusinessNameStep() {
       />
 
       <Text style={[globalStyles.title, { marginTop: spacing.xl + 40 }]}>
-        Business Name
+        Your Name / Business Name ? 
       </Text>
 
       <TextInput
@@ -58,7 +58,7 @@ export default function BusinessNameStep() {
       <Button
         mode="contained"
         disabled={!businessName}
-        onPress={() => navigation.navigate('BusinessLogo')}
+        onPress={() => navigation.navigate('BusinessLocation')}
         style={[
           globalStyles.button,
           {

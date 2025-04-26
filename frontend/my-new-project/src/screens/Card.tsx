@@ -22,15 +22,15 @@ import {
   useTheme,
   MD3Theme,
 } from 'react-native-paper';
-import { Job } from '../models/jobModel'; // Adjust path if needed
+import { Business } from '../models/BusinessModel'; // Adjust path if needed
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 
 interface CardProps {
-  job: Job;
-  onSwipeLeft: (job: Job) => void;
-  onSwipeRight: (job: Job) => void;
+  job: Business;
+  onSwipeLeft: (job: Business) => void;
+  onSwipeRight: (job: Business) => void;
   onAfterSwipe: () => void;
   isTop: boolean;
 }

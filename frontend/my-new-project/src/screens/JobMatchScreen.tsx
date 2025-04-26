@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, auth } from '../api/firebase'; // ✅ adjust this to your Firebase config file
-import { Job } from '../models/jobModel'; // ✅ adjust to your actual model path
+import { Business } from '../models/BusinessModel'; // ✅ adjust to your actual model path
 import SwipeableCardStack from './SwipeableCardStack'; // ✅ adjust path if needed
-import {likeJob, dislikeJob} from '../helpers/jobHelper'; // ✅ adjust this import to your Firebase config file
+import { likeJob, dislikeJob } from '../helpers/jobHelper'; // ✅ adjust this import to your Firebase config file
 
 export default function JobMatchScreen() {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const workerId: string | undefined = auth.currentUser?.uid;
 
@@ -17,7 +17,7 @@ export default function JobMatchScreen() {
         console.log('[JobMatchScreen] 🔄 Fetching jobs...');
         const snapshot = await getDocs(collection(db, 'jobs'));
 
-        const fetchedJobs: Job[] = snapshot.docs.map(doc => {
+        const fetchedJobs: Business[] = snapshot.docs.map(doc => {
           const data = doc.data();
           return {
             id: doc.id,
@@ -37,7 +37,8 @@ export default function JobMatchScreen() {
             rejected: typeof data.rejected === 'object' && data.rejected !== null ? data.rejected : {},
             created_at: data.created_at ?? null,
             imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [],
-            industry: data.industry ?? '', 
+            industry: data.industry ?? '',
+            availability: data.availability ?? 'unknown', // Add default or derived value for availability
           };
         }).filter(job => job.is_active);
 
@@ -65,21 +66,21 @@ export default function JobMatchScreen() {
   return (
     <View style={styles.container}>
       {jobs.length > 0 ? (
-      <SwipeableCardStack
-        jobs={jobs}
-        onSwipeRight={(job: Job) => {
-        if (!workerId) return;
-        console.log('👉 Liked:', job.title);
-        likeJob(workerId, job.id);
-        }}
-        onSwipeLeft={(job: Job) => {
-        if (!workerId) return;
-        console.log('👈 Disliked:', job.title);
-        dislikeJob(workerId, job.id);
-        }}
-      />
+        <SwipeableCardStack
+          jobs={jobs}
+          onSwipeRight={(job: Business) => {
+            if (!workerId) return;
+            console.log('👉 Liked:', job.title);
+            likeJob(workerId, job.id);
+          }}
+          onSwipeLeft={(job: Business) => {
+            if (!workerId) return;
+            console.log('👈 Disliked:', job.title);
+            dislikeJob(workerId, job.id);
+          }}
+        />
       ) : (
-      <Text style={{ textAlign: 'center', marginTop: 100 }}>🎉 No jobs available</Text>
+        <Text style={{ textAlign: 'center', marginTop: 100 }}>🎉 No jobs available</Text>
       )}
     </View>
   );

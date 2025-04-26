@@ -19,13 +19,13 @@ import AvailabilityStep from '../profile/worker/AvailabilityStep';
 // —— Business steps ——
 import BusinessNameStep from '../profile/business/BusinessNameStep';
 import BusinessLogoStep from '../profile/business/BusinessLogoStep';
+import BusinessLocationStep from '../profile/business/BusinessLocationStep'; // Assuming same as worker location
 import JobTitleStep from '../profile/business/JobTitleStep';
 import JobDescriptionStep from '../profile/business/JobDescriptionStep';
 import JobTagsStep from '../profile/business/JobTagsStep';
 import JobSkillsStep from '../profile/business/JobSkillsStep';
 import JobExperienceRequiredStep from '../profile/business/JobExperienceRequiredStep';
 import JobAvailabilityStep from '../profile/business/JobAvailabilityStep';
-import JobLocationBusinessStep from '../profile/business/JobLocationBusinessStep';
 import JobSalaryBusinessStep from '../profile/business/JobSalaryBusinessStep';
 import JobBenefitsBusinessStep from '../profile/business/JobBenefitsBusinessStep';
 import ConfirmPublishStep from '../profile/business/ConfirmPublishStep';
@@ -50,6 +50,7 @@ export type ProfileSetupParamList = {
   // Business flow
   BusinessName: undefined;
   BusinessLogo: undefined;
+  BusinessLocation: undefined;
   JobTitle: undefined;
   JobDescription: undefined;
   JobTags: undefined;
@@ -88,6 +89,7 @@ export default function ProfileSetupNavigator() {
 
       {/* — Business flow — */}
       <Stack.Screen name="BusinessName" component={BusinessNameStep} />
+      <Stack.Screen name="BusinessLocation" component={BusinessLocationStep} /> 
       <Stack.Screen name="BusinessLogo" component={BusinessLogoStep} />
       <Stack.Screen name="JobTitle" component={JobTitleStep} />
       <Stack.Screen name="JobDescription" component={JobDescriptionStep} />
@@ -95,7 +97,7 @@ export default function ProfileSetupNavigator() {
       <Stack.Screen name="JobSkills" component={JobSkillsStep} />
       <Stack.Screen name="JobExperienceRequired" component={JobExperienceRequiredStep} />
       <Stack.Screen name="JobAvailability" component={JobAvailabilityStep} />
-      <Stack.Screen name="JobLocationBusiness" component={JobLocationBusinessStep} />
+      {/* <Stack.Screen name="EmployeeDistance" component={EmployeeDistance} /> */}
       <Stack.Screen name="JobSalaryBusiness" component={JobSalaryBusinessStep} />
       <Stack.Screen name="JobBenefitsBusiness" component={JobBenefitsBusinessStep} />
       <Stack.Screen name="ConfirmPublish" component={ConfirmPublishStep} />

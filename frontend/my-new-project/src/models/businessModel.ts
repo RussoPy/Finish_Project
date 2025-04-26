@@ -2,12 +2,11 @@
 
 import { Timestamp } from 'firebase/firestore'; // Import Firestore Timestamp type
 
-export interface Job {
+export interface Business {
     id: string;                     // Unique ID for the job posting
-    business_id: string;            // ID of the Business posting the job (links to Business model)
 
-    // --- Core Job Details ---
-    title: string;                  // Job title (e.g., "Frontend Developer")
+    // --- Core Business Details ---
+    title: string;                  // Business title (e.g., "Frontend Developer")
     industry: string;               // Industry (e.g., "Technology", "Healthcare")
     description: string;            // Detailed job description
     tags: string[];                 // Keywords for the role/responsibilities (e.g., "React", "Node.js", "UI/UX")
@@ -26,7 +25,6 @@ export interface Job {
     salary_max?: number;             // Optional maximum salary
     minimum_age?: number;           // Optional minimum age requirement
     benefits?: string[];            // List of key benefits offered (e.g., "Health Insurance", "Paid Time Off", "Stock Options")
-
     // --- Business Context (can be denormalized for easy display) ---
     business_name?: string;         // Name of the business (pulled from Business profile)
     logo_url?: string;              // Logo URL (pulled from Business profile)
