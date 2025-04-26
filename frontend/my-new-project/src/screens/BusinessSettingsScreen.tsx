@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { View, ScrollView, TextInput, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, ScrollView, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { auth, db } from '../api/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -48,13 +48,18 @@ const SettingsItem = ({
 
 export default function BusinessSettingsScreen() {
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState<string | null>(null);
   const [form, setForm] = useState({
     business_name: '',
     logo_url: '' as string | null,
     industries: [] as string[],
     benefits: [] as string[],
     location_address: '',
+    availability: '',
+    minimum_age: '',
+    salary_min: '',
+    salary_max: '',
+    description: '',
+    imageUrls: [] as string[], // ✅ <<< ADD THIS LINE
   });
 
   const navigation = useNavigation<any>();
@@ -72,6 +77,12 @@ export default function BusinessSettingsScreen() {
           industries: d.industries || [],
           benefits: d.benefits || [],
           location_address: d.location_address || '',
+          availability: d.availability || '',
+          minimum_age: d.minimum_age ? d.minimum_age.toString() : '',
+          salary_min: d.salary_min ? d.salary_min.toString() : '',
+          salary_max: d.salary_max ? d.salary_max.toString() : '',
+          description: d.description || '',
+          imageUrls: d.imageUrls || [], // ✅ ADD THIS
         });
       }
       setLoading(false);
@@ -112,15 +123,7 @@ export default function BusinessSettingsScreen() {
           <Text style={{ fontSize: 12, fontWeight: '500', color: '#333' }}>Logout</Text>
         </TouchableOpacity>
 
-        <Text style={{
-          fontSize: 22,
-          fontFamily: 'PoetsenOne_400Regular',
-          marginBottom: 25,
-          marginTop: 30,
-          textAlign: 'center',
-          color: '#222222',
-          letterSpacing: 0.3,
-        }}>
+        <Text style={{ fontSize: 22, fontFamily: 'PoetsenOne_400Regular', marginBottom: 25, marginTop: 30, textAlign: 'center', color: '#222222', letterSpacing: 0.3 }}>
           Business Settings
         </Text>
 
@@ -129,111 +132,127 @@ export default function BusinessSettingsScreen() {
             imageUri={form.logo_url!}
             onChange={(url) => setForm((prev) => ({ ...prev, logo_url: url }))}
           />
-          <View style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            backgroundColor: '#fff',
-            borderRadius: 12,
-            padding: 8,
-            elevation: 3,
-          }}>
+          <View style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: '#fff', borderRadius: 12, padding: 8, elevation: 3 }}>
             <Icon name="upload" size={14} color="#333" />
           </View>
         </View>
 
-        <Text style={{
-          fontSize: 20,
-          fontWeight: '700',
-          color: '#222',
-          fontFamily: 'PoetsenOne_400Regular',
-        }}>
+        <Text style={{ fontSize: 20, fontWeight: '700', color: '#222', fontFamily: 'PoetsenOne_400Regular' }}>
           {form.business_name || 'Your Business Name'}
         </Text>
 
-        <Text style={{
-          color: '#666',
-          marginTop: 6,
-          fontFamily: 'PoetsenOne_400Regular',
-        }}>
+        <Text style={{ color: '#666', marginTop: 6, fontFamily: 'PoetsenOne_400Regular' }}>
           {form.location_address || 'No location added'}
         </Text>
       </View>
 
       {/* Settings Items */}
       <ScrollView style={{ flex: 1 }}>
-        <SettingsItem
-          icon="briefcase"
-          label="Industry"
-          onPress={() => {
-            // navigate to your EditIndustries screen (build it similar to EditSkills)
-            navigation.navigate('EditIndustry', {
-              currentIndustries: form.industries,
-              onSave: (val: string[]) => setForm((prev) => ({ ...prev, industries: val })),
-            });
-          }}
-        />
+  <SettingsItem
+    icon="map-pin"
+    label="Location Address"
+    onPress={() => {
+      navigation.navigate('EditLocation', {
+        currentAddress: form.location_address,
+        onSave: (val: string) => setForm((prev) => ({ ...prev, location_address: val })),
+      });
+    }}
+  />
 
-        <SettingsItem
-          icon="gift"
-          label="Benefits"
-          onPress={() => {
-            // navigate to your EditBenefits screen (you can create it similarly)
-            navigation.navigate('EditBenefits', {
-              currentBenefits: form.benefits,
-              onSave: (val: string[]) => setForm((prev) => ({ ...prev, benefits: val })),
-            });
-          }}
-        />
+  <SettingsItem
+    icon="briefcase"
+    label="Industry"
+    onPress={() => navigation.navigate('EditIndustry', {
+      currentIndustries: form.industries,
+      onSave: (val: string[]) => setForm((prev) => ({ ...prev, industries: val })),
+    })}
+  />
 
-        <SettingsItem
-          icon="map-pin"
-          label="Location Address"
-          onPress={() => {
-            navigation.navigate('EditLocation', {
-              currentAddress: form.location_address,
-              onSave: (val: string) => setForm((prev) => ({ ...prev, location_address: val })),
-            });
-          }}
-        />
+  <SettingsItem
+    icon="gift"
+    label="Benefits"
+    onPress={() => navigation.navigate('EditBenefits', {
+      currentBenefits: form.benefits,
+      onSave: (val: string[]) => setForm((prev) => ({ ...prev, benefits: val })),
+    })}
+  />
 
-        <SettingsItem
-          icon="clipboard"
-          label="Manage Jobs"
-          onPress={() => navigation.navigate('JobList')}
-        />
+  <SettingsItem
+    icon="clock"
+    label="Availability"
+    onPress={() => navigation.navigate('EditAvailability', {
+      currentAvailability: form.availability,
+      onSave: (val: string) => setForm((prev) => ({ ...prev, availability: val })),
+    })}
+  />
 
-        {/* Save button */}
-        <View style={{ padding: 20, alignItems: 'center' }}>
-          <Button
-            mode="contained"
-            onPress={saveAll}
-            style={{
-              backgroundColor: '#81c9f0',
-              borderRadius: 20,
-              alignSelf: 'center',
-              paddingHorizontal: 32,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.15,
-              shadowRadius: 4,
-              elevation: 8,
-            }}
-            contentStyle={{
-              paddingVertical: 10,
-              paddingHorizontal: 16,
-            }}
-            labelStyle={{
-              fontFamily: 'RobotoMono_400Regular',
-              fontWeight: '600',
-              color: 'black',
-              fontSize: 16,
-            }}
-          >
-            Save All Changes
-          </Button>
-        </View>
-      </ScrollView>
+  <SettingsItem
+    icon="user"
+    label="Minimum Age"
+    onPress={() => navigation.navigate('EditMinimumAge', {
+      currentAge: form.minimum_age,
+      onSave: (val: string) => setForm((prev) => ({ ...prev, minimum_age: val })),
+    })}
+  />
+
+  <SettingsItem
+    icon="dollar-sign"
+    label="Salary Range"
+    onPress={() => navigation.navigate('SalaryEditor', {
+      salaryMin: form.salary_min,
+      salaryMax: form.salary_max,
+      onSave: (min: string, max: string) => setForm((prev) => ({ ...prev, salary_min: min, salary_max: max })),
+    })}
+  />
+
+<SettingsItem
+  icon="image"
+  label="Upload Company Images"
+  onPress={() => {
+    navigation.navigate('EditImages', {
+      currentImages: form.imageUrls || [],
+      onSave: (val: string[]) => setForm((prev) => ({ ...prev, imageUrls: val })),
+    });
+  }}
+/>
+
+  <SettingsItem
+    icon="file-text"
+    label="Business Description"
+    onPress={() => navigation.navigate('EditDescription', {
+      currentDescription: form.description,
+      onSave: (val: string) => setForm((prev) => ({ ...prev, description: val })),
+    })}
+  />
+
+  {/* Save button */}
+  <View style={{ padding: 20, alignItems: 'center' }}>
+    <Button
+      mode="contained"
+      onPress={saveAll}
+      style={{
+        backgroundColor: '#81c9f0',
+        borderRadius: 20,
+        alignSelf: 'center',
+        paddingHorizontal: 32,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 8,
+      }}
+      contentStyle={{ paddingVertical: 10, paddingHorizontal: 16 }}
+      labelStyle={{
+        fontFamily: 'RobotoMono_400Regular',
+        fontWeight: '600',
+        color: 'black',
+        fontSize: 16,
+      }}
+    >
+      Save All Changes
+    </Button>
+  </View>
+</ScrollView>
 
       <Toast />
     </View>
